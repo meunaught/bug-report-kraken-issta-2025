@@ -1,0 +1,18 @@
+\begin{longtable}{@{}lll@{}}
+\caption{All {{ total_cves }} CVEs with upstream bug report links.}
+\label{tab:cves} \\
+\toprule
+\textbf{CVE ID [JSON]} & \textbf{Project} & \textbf{Bug Report} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{c}{\small\textit{(Table \ref{tab:cves} continued)}} \\
+\toprule
+\textbf{CVE ID [JSON]} & \textbf{Project} & \textbf{Bug Report} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+{% for row in rows %}
+    \href{ {{- row.json_url -}} }{\texttt{ {{- row.cve_id -}} }} & {{ row.project }} & {% if row.bug_url %}\href{ {{- row.bug_url -}} }{ {{- row.label -}} }{% else %}N/A{% endif %} \\
+{% endfor %}
+\end{longtable}

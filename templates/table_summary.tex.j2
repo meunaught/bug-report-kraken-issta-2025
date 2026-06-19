@@ -1,0 +1,20 @@
+\begin{longtable}{llrrrc}
+\caption{Summary of bug reports across all 37 KRAKEN target projects.}
+\label{tab:summary} \\
+\toprule
+\textbf{Project} & \textbf{Version} & \textbf{Bugs} & \textbf{CVEs} & \textbf{Links Found} & \textbf{Platform} \\
+\midrule
+\endfirsthead
+\multicolumn{6}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
+\toprule
+\textbf{Project} & \textbf{Version} & \textbf{Bugs} & \textbf{CVEs} & \textbf{Links Found} & \textbf{Platform} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+{% for row in rows %}
+{{ row.display_name }} & {{ row.version }} & {{ row.bugs }} & {{ row.cves }} & {{ row.links_found }} & {{ row.platform }} \\
+{% endfor %}
+\midrule
+\textbf{Total} & & \textbf{ {{- total_bugs -}} } & \textbf{ {{- total_cves -}} } & \textbf{ {{- total_links -}} } & \\
+\end{longtable}
