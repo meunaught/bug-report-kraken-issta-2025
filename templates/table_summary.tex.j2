@@ -1,29 +1,32 @@
-\begin{longtable}{@{}lp{3.4cm}rr@{}}
+\definecolor{rowmiss}{RGB}{255,220,220}
+\definecolor{rowextra}{RGB}{220,240,220}
+\begin{longtable}{@{}lp{3.4cm}rrr@{}}
 \caption{Bug reports filed by Anshunkang Zhou across all 37 KRAKEN projects, compared
   against the KRAKEN supplement (Table~1).
-  \emph{Found} counts reflect only bugs confirmed under the author's known identifiers.}
+  \emph{Found} counts reflect only bugs confirmed under the author's known identifiers.
+  Shaded rows indicate a mismatch; $\Delta$ = Found $-$ Paper.}
 \label{tab:summary} \\
 \toprule
 \textbf{Project} & \textbf{Platform} &
 \textbf{\shortstack[r]{Paper\\bugs}} &
-\textbf{\shortstack[r]{Found\\bugs}} \\
+\textbf{\shortstack[r]{Found\\bugs}} &
+\textbf{$\Delta$} \\
 \midrule
 \endfirsthead
-\multicolumn{4}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
+\multicolumn{5}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
 \toprule
 \textbf{Project} & \textbf{Platform} &
 \textbf{\shortstack[r]{Paper\\bugs}} &
-\textbf{\shortstack[r]{Found\\bugs}} \\
+\textbf{\shortstack[r]{Found\\bugs}} &
+\textbf{$\Delta$} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
 {% for row in rows %}
-{{ row.display_name }} & {{ row.platform }} & {{ row.paper_bugs }} & {{ row.found_bugs }}{% if row.found_bugs < row.paper_bugs %}\textsuperscript{$\star$}{% elif row.found_bugs > row.paper_bugs %}\textsuperscript{$\uparrow$}{% endif %} \\
+{% if row.delta < 0 %}\rowcolor{rowmiss}{% elif row.delta > 0 %}\rowcolor{rowextra}{% endif %}
+{{ row.display_name }} & {{ row.platform }} & {{ row.paper_bugs }} & {{ row.found_bugs }} & {% if row.delta > 0 %}$+{{ row.delta }}${% elif row.delta < 0 %}${{ row.delta }}${% else %}---{% endif %} \\
 {% endfor %}
 \midrule
-\textbf{Total} & & \textbf{ {{- rows|sum(attribute='paper_bugs') -}} } & \textbf{ {{- rows|sum(attribute='found_bugs') -}} } \\
+\textbf{Total} & & \textbf{ {{- rows|sum(attribute='paper_bugs') -}} } & \textbf{ {{- rows|sum(attribute='found_bugs') -}} } & \textbf{ {%- set net = rows|sum(attribute='delta') -%}{% if net > 0 %}$+{{ net }}${% elif net < 0 %}${{ net }}${% else %}---{% endif %}} \\
 \end{longtable}
-\smallskip\noindent
-\textsuperscript{$\star$}~Fewer bugs found than claimed (deleted or filed under unknown identity).\quad
-\textsuperscript{$\uparrow$}~More bugs found than claimed (may include issues outside the paper's experiment window).

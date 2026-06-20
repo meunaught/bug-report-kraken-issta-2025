@@ -5,6 +5,7 @@
 \usepackage{array}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{colortbl}
 \usepackage{enumitem}
 \usepackage{parskip}
 \usepackage{fancyhdr}
@@ -245,13 +246,10 @@ absent from the author's live bug tracker activity. Each entry falls into one of
 \section{Conclusion}
 \label{sec:conclusion}
 
-The pipeline recovered \textbf{191 of the 192 bug reports} across 32 of 37 KRAKEN projects
-and confirmed \textbf{105 of the 117 resolvable CVEs} (2 of the 119 KRAKEN CVEs have no
+The pipeline found \textbf{191 bug reports} across 32 of 37 KRAKEN projects
+(the paper claims 192; Table~\ref{tab:summary} shows the per-project delta).
+105 of the 117 resolvable CVEs were confirmed (2 of the 119 KRAKEN CVEs have no
 CVEProject record; 12 others appear only in CVE JSON references, not in the author search).
-
-The one-bug shortfall ($192 - 15 + 14 = 191$) reflects two opposing effects:
-five projects yielded no results (15 bugs missing), while five others returned more issues
-than the paper claims, adding 14 bugs likely filed outside the experiment window.
 The 12 unmatched CVEs (\texttt{ncurses}, \texttt{pdftools}) appear in Table~\ref{tab:orphans}.
 
 %----------------------------------------------------------------------

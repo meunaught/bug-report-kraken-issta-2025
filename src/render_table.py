@@ -129,6 +129,7 @@ class SummaryRow:
     platform: str
     paper_bugs: int
     found_bugs: int
+    delta: int
 
 
 def render_summary() -> None:
@@ -151,11 +152,13 @@ def render_summary() -> None:
     rows: list[SummaryRow] = []
     for proj in all_projects:
         paper_bugs, _ = _PAPER_STATS.get(proj, (0, 0))
+        fb = len(found_bugs.get(proj, set()))
         rows.append(SummaryRow(
             display_name=_DISPLAY_NAME.get(proj) or tex_escape(proj),
             platform=tex_escape(platform_map.get(proj, "GitHub Issues")),
             paper_bugs=paper_bugs,
-            found_bugs=len(found_bugs.get(proj, set())),
+            found_bugs=fb,
+            delta=fb - paper_bugs,
         ))
 
     env = _jinja_env()
