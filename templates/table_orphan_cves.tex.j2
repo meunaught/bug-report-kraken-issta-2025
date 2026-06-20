@@ -1,0 +1,23 @@
+\begin{longtable}{@{}lll@{}}
+\caption{CVE-referenced bug reports not found in author search (likely deleted).}
+\label{tab:orphans} \\
+\toprule
+\textbf{Project} & \textbf{Bug Report} & \textbf{CVE ID [JSON]} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{c}{\small\textit{(Table \ref{tab:orphans} continued)}} \\
+\toprule
+\textbf{Project} & \textbf{Bug Report} & \textbf{CVE ID [JSON]} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+{% set ns = namespace(prev_proj='') %}
+{% for row in orphans %}
+{% if row.project != ns.prev_proj %}
+{% if ns.prev_proj != '' %}\addlinespace[4pt]{% endif %}
+{% set ns.prev_proj = row.project %}
+{% endif %}
+{{ row.display_name if row.project != orphans[loop.index0 - 1].project or loop.first else '' }} & \href{ {{- row.bug_url -}} }{ {{- row.label -}} } & \href{ {{- row.json_url -}} }{\texttt{ {{- row.cve_id -}} }} \\
+{% endfor %}
+\end{longtable}

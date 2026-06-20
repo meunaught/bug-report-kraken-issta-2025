@@ -1,20 +1,20 @@
-\begin{longtable}{llrrrc}
-\caption{Summary of bug reports across all 37 KRAKEN target projects.}
+\begin{longtable}{lrrrr}
+\caption{Bug reports filed by Anshunkang Zhou, joined with KRAKEN CVE assignments.}
 \label{tab:summary} \\
 \toprule
-\textbf{Project} & \textbf{Version} & \textbf{Bugs} & \textbf{CVEs} & \textbf{Links Found} & \textbf{Platform} \\
+\textbf{Project} & \textbf{Bugs Filed} & \textbf{With CVE} & \textbf{Without CVE} & \textbf{Platform} \\
 \midrule
 \endfirsthead
-\multicolumn{6}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
+\multicolumn{5}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
 \toprule
-\textbf{Project} & \textbf{Version} & \textbf{Bugs} & \textbf{CVEs} & \textbf{Links Found} & \textbf{Platform} \\
+\textbf{Project} & \textbf{Bugs Filed} & \textbf{With CVE} & \textbf{Without CVE} & \textbf{Platform} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
 {% for row in rows %}
-{{ row.display_name }} & {{ row.version }} & {{ row.bugs }} & {{ row.cves }} & {{ row.links_found }} & {{ row.platform }} \\
+{{ row.display_name }} & {{ row.bugs_filed }} & {{ row.with_cve }} & {{ row.without_cve }} & {{ row.platform }} \\
 {% endfor %}
 \midrule
-\textbf{Total} & & \textbf{ {{- total_bugs -}} } & \textbf{ {{- total_cves -}} } & \textbf{ {{- total_links -}} } & \\
+\textbf{Total} & \textbf{ {{- total_filed -}} } & \textbf{ {{- total_with -}} } & \textbf{ {{- total_without -}} } & \\
 \end{longtable}

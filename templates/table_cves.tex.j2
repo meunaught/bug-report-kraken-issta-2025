@@ -1,18 +1,21 @@
 \begin{longtable}{@{}lll@{}}
-\caption{All {{ total_cves }} CVEs with upstream bug report links.}
+\caption{All {{ total_bugs }} bug reports filed by the paper author ({{ total_cves }} with CVE ID).}
 \label{tab:cves} \\
 \toprule
-\textbf{CVE ID [JSON]} & \textbf{Project} & \textbf{Bug Report} \\
+\textbf{Project} & \textbf{Bug Report} & \textbf{CVE ID [JSON]} \\
 \midrule
 \endfirsthead
 \multicolumn{3}{c}{\small\textit{(Table \ref{tab:cves} continued)}} \\
 \toprule
-\textbf{CVE ID [JSON]} & \textbf{Project} & \textbf{Bug Report} \\
+\textbf{Project} & \textbf{Bug Report} & \textbf{CVE ID [JSON]} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
-{% for row in rows %}
-    \href{ {{- row.json_url -}} }{\texttt{ {{- row.cve_id -}} }} & {{ row.project }} & {% if row.bug_url %}\href{ {{- row.bug_url -}} }{ {{- row.label -}} }{% else %}N/A{% endif %} \\
+{% for project_name, proj_rows in groups %}
+{% for row in proj_rows %}
+    {{ project_name if loop.first else '' }} & {% if row.bug_url %}\href{ {{- row.bug_url -}} }{ {{- row.label -}} }{% else %}N/A{% endif %} & {% if row.cve_id %}\href{ {{- row.json_url -}} }{\texttt{ {{- row.cve_id -}} }}{% else %}---{% endif %} \\
+{% endfor %}
+{% if not loop.last %}\midrule{% endif %}
 {% endfor %}
 \end{longtable}

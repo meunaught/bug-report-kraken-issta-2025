@@ -55,113 +55,102 @@ issues or pull requests (but also via Bugzilla, SourceForge, and mailing lists).
 %----------------------------------------------------------------------
 \section{Search Process}
 
-The overall strategy is illustrated in Figure~\ref{fig:flowchart}. The process splits into
-two paths after extracting the CVE list: a CVE-based automated path and a manual path for
-the six projects with no CVE assignments.
+The overall strategy is illustrated in Figure~\ref{fig:flowchart}. Two independent paths
+are run in parallel and then joined on the bug report URL to produce the final dataset.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-  node distance = 0.55cm and 1.8cm,
+  node distance = 0.6cm and 1.6cm,
   start/.style   = {rectangle, rounded corners=4pt, draw=gray!70, fill=gray!12,
-                    text width=5.5cm, align=center, minimum height=0.75cm, font=\small},
-  shared/.style  = {rectangle, draw=black!60, fill=black!6,
-                    text width=5.5cm, align=center, minimum height=0.75cm, font=\small},
+                    text width=4.2cm, align=center, minimum height=0.75cm, font=\small},
   cvebox/.style  = {rectangle, draw=blue!60!black, fill=blue!9,
-                    text width=5.5cm, align=center, minimum height=0.75cm, font=\small},
-  ncvebox/.style = {rectangle, draw=orange!70!black, fill=orange!9,
-                    text width=4cm, align=center, minimum height=0.75cm, font=\small},
-  decide/.style  = {diamond, aspect=2.3, draw=black!80, fill=yellow!22,
-                    text width=2.3cm, align=center, font=\small\itshape, inner sep=1pt},
+                    text width=4.2cm, align=center, minimum height=0.75cm, font=\small},
+  authbox/.style = {rectangle, draw=green!50!black, fill=green!8,
+                    text width=4.2cm, align=center, minimum height=0.75cm, font=\small},
+  joinbox/.style = {rectangle, rounded corners=4pt, draw=purple!60!black, fill=purple!8,
+                    text width=4.2cm, align=center, minimum height=0.75cm, font=\small},
   ok/.style      = {rectangle, rounded corners=3pt, draw=green!55!black, fill=green!10,
-                    text width=5.5cm, align=center, minimum height=0.75cm, font=\small},
-  fail/.style    = {rectangle, rounded corners=3pt, draw=red!55!black, fill=red!8,
-                    text width=2.8cm, align=center, minimum height=0.7cm, font=\small},
+                    text width=9cm, align=center, minimum height=0.75cm, font=\small},
   arr/.style     = {-Stealth, thick},
   cvearr/.style  = {-Stealth, thick, blue!65!black},
-  ncvearr/.style = {-Stealth, thick, orange!75!black},
+  autharr/.style = {-Stealth, thick, green!55!black},
+  joinarr/.style = {-Stealth, thick, purple!60!black},
 ]
 
-%% ── Shared top chain ──────────────────────────────────────────────
-\node[start]  (paper)  {KRAKEN paper (ISSTA 2025)};
-\node[shared, below=of paper] (supp)
-    {Supplement PDF: 37 projects with bug/CVE counts\\(no links -- anonymous submission)};
-\node[shared, below=of supp]  (readme)
-    {KRAKEN GitHub README:\\119 CVE IDs in Trophy section};
-\node[decide, below=0.7cm of readme] (dec) {CVE\\assigned?};
+%% ── Shared source ─────────────────────────────────────────────────
+\node[start] (readme) {KRAKEN GitHub README\\119 CVE IDs (Trophy section)};
 
-%% ── CVE path (left branch) ────────────────────────────────────────
-\node[cvebox, below left=1.4cm and 3.8cm of dec] (url)
-    {Construct CVEProject JSON URL:\\[3pt]
-     {\footnotesize\texttt{cves/\{year\}/\{Nxxx\}/\{CVE-ID\}.json}}};
-\node[cvebox, below=of url] (fetch)
-    {Fetch JSON from CVEProject/cvelistV5 (GitHub)};
-\node[decide, below=0.7cm of fetch] (jdec) {JSON\\found?};
-\node[ok,     below=0.7cm of jdec] (extract)
-    {Extract \texttt{references} field $\rightarrow$ upstream bug report URL\\
-     \textbf{117\,/\,119 CVEs resolved}};
-\node[fail,   right=1.0cm of jdec] (notfound)
-    {CVE not in DB\\(2 CVEs)};
+%% ── CVE path (left) ───────────────────────────────────────────────
+\node[cvebox, below left=1.4cm and 2.3cm of readme] (json)
+    {CVEProject/cvelistV5\\fetch JSON per CVE ID};
+\node[cvebox, below=of json] (refs)
+    {Extract \texttt{references} field\\$\rightarrow$ bug report URL\\
+     {\small\textbf{117\,/\,119 CVEs resolved}}};
 
-%% ── Non-CVE path (right branch, intentionally incomplete) ─────────
-\node[ncvebox, below right=1.4cm and 0cm of dec] (manual)
-    {Manual search required\\[3pt]
-     {\small 6 projects, 14 bugs (no CVE)}\\
-     {\footnotesize manual search required}};
+%% ── Author path (right) ───────────────────────────────────────────
+\node[authbox, below right=1.4cm and 2.3cm of readme] (identity)
+    {Author: Anshunkang Zhou\\
+     \texttt{seviezhou} (GitHub/Trac)\\
+     \texttt{azhouad} (SourceForge)};
+\node[authbox, below=of identity] (platforms)
+    {Query by author identity:\\
+     GitHub · Trac · SourceForge\\
+     Red Hat Bugzilla};
+
+%% ── Join ──────────────────────────────────────────────────────────
+\node[joinbox, below=2.8cm of readme] (join)
+    {JOIN on \texttt{bug\_url}\\(normalize, left join)};
+
+%% ── Output ────────────────────────────────────────────────────────
+\node[ok, below=0.6cm of join] (out)
+    {\textbf{188 bug reports} across 31 of 37 KRAKEN projects
+     \quad|\quad 113 with CVE \quad|\quad 75 without CVE};
 
 %% ── Arrows ────────────────────────────────────────────────────────
-\draw[arr]    (paper)  -- (supp);
-\draw[arr]    (supp)   -- (readme);
-\draw[arr]    (readme) -- (dec);
+\draw[cvearr]  (readme) -- node[above,sloped,font=\small]{CVE IDs} (json);
+\draw[cvearr]  (json)   -- (refs);
+\draw[cvearr]  (refs)   -- (join);
 
-\draw[cvearr] (dec)   -- node[above,sloped,font=\small]{Yes} (url);
-\draw[cvearr] (url)   -- (fetch);
-\draw[cvearr] (fetch) -- (jdec);
-\draw[cvearr] (jdec)  -- node[left,  font=\small]{Yes} (extract);
-\draw[cvearr] (jdec)  -- node[above, font=\small]{No}  (notfound);
+\draw[autharr] (readme)   -- node[above,sloped,font=\small]{author query} (identity);
+\draw[autharr] (identity) -- (platforms);
+\draw[autharr] (platforms) -- (join);
 
-\draw[ncvearr] (dec) -- node[above,sloped,font=\small]{No} (manual);
+\draw[joinarr] (join) -- (out);
 
 %% ── Background shading ────────────────────────────────────────────
 \begin{scope}[on background layer]
   \node[inner sep=9pt, fill=blue!4, draw=blue!25, rounded corners,
-        fit=(url)(fetch)(jdec)(extract)(notfound)] {};
-  \node[inner sep=9pt, fill=orange!4, draw=orange!25, rounded corners,
-        fit=(manual)] {};
+        fit=(json)(refs)] {};
+  \node[inner sep=9pt, fill=green!4, draw=green!25, rounded corners,
+        fit=(identity)(platforms)] {};
 \end{scope}
 
 \end{tikzpicture}
 \caption{Search process for locating KRAKEN bug reports.
-  \textcolor{blue!55!black}{\textbf{Blue:}} CVE-based path -- 119 CVE IDs traced through
-  the CVEProject JSON database; 117 links confirmed, 2 not found.
-  \textcolor{orange!70!black}{\textbf{Orange:}} Non-CVE path -- 14 bugs across 6 projects
-  with no CVE assignments; requires manual issue tracker search (incomplete).}
+  \textcolor{blue!55!black}{\textbf{Blue:}} CVE-based path --- 119 CVE IDs fetched from
+  the CVEProject JSON database; 117 bug report URLs resolved.
+  \textcolor{green!45!black}{\textbf{Green:}} Author-based path --- bug tracker accounts
+  of the first author queried across GitHub, FFmpeg Trac, SourceForge, and Bugzilla.
+  \textcolor{purple!60!black}{\textbf{Purple:}} Results joined on \texttt{bug\_url} to
+  produce the final dataset of 188 unique bug reports across 31 of 37 KRAKEN projects.}
 \label{fig:flowchart}
 \end{figure}
 
-\paragraph{Step 1 --- Supplement PDF.}
-The paper's \href{https://github.com/seviezhou/Kraken/blob/main/supplement/supplement-material.pdf}{supplement PDF}
-provides a table of all 37 target projects, each with the number of bugs found and the
-number of CVEs assigned. It contains no CVE IDs and no links to bug reports, as both were
-withheld for anonymity during the review period.
-
-\paragraph{Step 2 --- KRAKEN GitHub README.}
+\paragraph{Step 1 --- KRAKEN GitHub README.}
 The KRAKEN repository at \url{https://github.com/seviezhou/Kraken} contains a Trophy
-section in its \texttt{README.md} that lists all 119 CVE IDs in full. These were extracted
-as the complete input set for the CVE-based search path.
+section in its \texttt{README.md} listing all 119 CVE IDs. These serve as the input for
+the CVE-based path.
 
-\paragraph{Step 3 --- Constructing the CVEProject JSON URL.}
+\paragraph{Step 2 --- CVE JSON lookup (blue path).}
 Each CVE ID maps to a JSON record in the \texttt{CVEProject/cvelistV5} GitHub repository.
-The path is derived mechanically: the year and the first part of the numeric ID determine
-the directory. For example:
+The path is derived mechanically from the CVE year and numeric prefix:
 
 \begin{center}
 \small\renewcommand{\arraystretch}{1.3}
 \begin{tabular}{@{}ll@{}}
 \toprule
 CVE ID   & \texttt{CVE-2021-39550} \\
-Year     & \texttt{2021} \\
-Number   & \texttt{39550} $\;\Rightarrow\;$ folder \texttt{39xxx} \\
 JSON URL & \href{https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/39xxx/CVE-2021-39550.json}{\texttt{.../cves/2021/39xxx/CVE-2021-39550.json}} \\
 \midrule
 \texttt{references} field & \url{https://github.com/sahaRatul/sela/issues/30} \\
@@ -169,21 +158,42 @@ JSON URL & \href{https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cve
 \end{tabular}
 \end{center}
 
-\noindent The \texttt{references} field in the JSON record is the upstream bug report filed
-by the authors. This one step resolved \textbf{117 out of 119 CVEs}.
+\noindent The \texttt{references} field yields the upstream bug report URL.
+This step resolved \textbf{117 out of 119 CVEs} (2 records absent from the database).
 
-\paragraph{Step 4 --- Direct issue tracker search (non-CVE path).}
-Six projects carry bugs but no CVE IDs: \textit{advancecomp}, \textit{asn1c},
-\textit{jhead}, \textit{libnsfdb}, \textit{nasm}, and \textit{sox}. Their reports require
-a manual keyword search of each project's tracker.
+\paragraph{Step 3 --- Author-based tracker search (green path).}
+The first author, Anshunkang Zhou, operates under different identities across platforms.
+Each tracker is queried directly by those identifiers:
+
+\begin{center}
+\small\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Platform} & \textbf{Identifier} & \textbf{Method} \\
+\midrule
+GitHub            & \texttt{seviezhou}    & Search API: \texttt{author:seviezhou type:issue} \\
+FFmpeg Trac       & \texttt{seviezhou}    & \texttt{/query?reporter=seviezhou\&format=tab} \\
+SourceForge       & \texttt{azhouad}      & Per-ticket fetch on giflib, gocr, fig2dev \\
+Red Hat Bugzilla  & Anshunkang Zhou       & Known bug IDs confirmed by acknowledgment \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Step 4 --- Join.}
+The two result sets are joined on the bug report URL (after stripping any
+\texttt{\#fragment} suffix). A left join from the author-search results onto the CVE
+records attaches a CVE ID to each bug where one exists, leaving the field blank otherwise.
+The final dataset contains \textbf{188 bug reports} across 31 of 37 KRAKEN projects: 113 with a CVE ID and 75 without.
 
 %----------------------------------------------------------------------
 \section{Summary by Project}
 \label{sec:summary}
 
-Table~\ref{tab:summary} summarises all 37 projects from the paper's supplement, along with
-the number of bugs found, CVEs assigned, and the number of confirmed bug report links
-located in this search.
+Table~\ref{tab:summary} summarises all projects where bug reports were filed by the paper's
+first author (Anshunkang Zhou), derived by joining the author's bug tracker activity with
+the KRAKEN CVE assignments. \textbf{Bugs Filed} is the total number of issues opened;
+\textbf{With CVE} counts those that received a CVE ID; \textbf{Without CVE} counts the
+remainder.
 
 \input{generated/table_summary}
 
@@ -199,36 +209,64 @@ located in this search.
 \section{Detailed Bug Report Links}
 \label{sec:links}
 
-Table~\ref{tab:cves} lists all 119 CVEs, grouped by project, along with the bug type
-inferred from the CVE description, a clickable link to the upstream bug report, and a link
-to the source CVE JSON record. Each row corresponds to one unique bug report. Where a single
-CVE references multiple upstream tickets (e.g.\ ffmpeg), one row is added per ticket.
+All bug reports in Table~\ref{tab:cves} were filed by \textbf{Anshunkang Zhou}, the paper's
+first author, who operates under the following identifiers across platforms:
+\begin{itemize}[nosep]
+    \item \textbf{GitHub / FFmpeg Trac:} \texttt{seviezhou}
+    \item \textbf{SourceForge:} \texttt{azhouad}
+    \item \textbf{Red Hat Bugzilla:} Anshunkang Zhou (real name)
+\end{itemize}
 
-\begin{center}
-\small\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Abbreviation} & \textbf{Meaning} \\
-\midrule
-Heap OOB       & Heap-based buffer overflow or over-read \\
-Stack OOB      & Stack-based buffer overflow or over-read \\
-Global OOB     & Global buffer overflow or over-read \\
-Null Deref     & Null pointer dereference \\
-Use After Free & Use-after-free \\
-Double Free    & Double free \\
-FPE            & Floating point exception \\
-Segfault       & Segmentation fault (type unspecified) \\
-Unknown        & Could not be inferred from CVE record \\
-N/A            & CVE record not in database \\
-\bottomrule
-\end{tabular}
-\end{center}
+The table is derived by joining the author's bug tracker activity with the KRAKEN CVE
+assignments and is grouped by project. Rows with a CVE ID link to the corresponding
+CVEProject JSON record; rows without one show ``---''. Where a single CVE references
+multiple upstream tickets (e.g.\ ffmpeg), one row is added per ticket.
 
 \input{generated/table_cves}
 
+\subsection*{CVE-Referenced Reports Not Found in Author Search}
+\label{sec:orphans}
+
+Table~\ref{tab:orphans} lists bug reports that appear in CVEProject JSON records but were
+absent from the author's live bug tracker activity. Each entry falls into one of two categories:
+
+\begin{itemize}[nosep]
+    \item \textbf{Deleted issues} --- the bug report existed at the time the CVE was filed
+          but has since been removed from the tracker.
+    \item \textbf{Unverifiable authorship} --- the issue is still accessible but could not
+          be confirmed as filed by Anshunkang Zhou under any of the known identifiers
+          (\texttt{seviezhou}, \texttt{azhouad}, real name).
+\end{itemize}
+
+\input{generated/table_orphan_cves}
+
 %----------------------------------------------------------------------
-\section{Observations}
+\section{Conclusion}
+\label{sec:conclusion}
 
-To be completed.
+Table~\ref{tab:comparison} compares per-project bug and CVE counts from the KRAKEN supplement
+material (Table~1) against what this pipeline was able to confirm.
+Overall, the pipeline recovered \textbf{188 of the 192 bug reports} and confirmed
+\textbf{105 of the 117 resolvable CVEs} (covering 113 CVE-linked rows in Table~\ref{tab:cves}).
 
+\paragraph{Why 113 CVE-linked rows, not 117.}
+Of the 119 CVE IDs listed in the KRAKEN trophy section, two
+(\texttt{CVE-2020-23927} and \texttt{CVE-2020-20817}) have no record in the CVEProject
+database, leaving 117 resolvable CVEs.
+Of those, 105 unique CVEs were traced to bug reports found in the author search and appear in
+Table~\ref{tab:cves} (some CVEs reference multiple tickets, yielding 113 rows in total).
+The remaining 12 CVEs are represented in Table~\ref{tab:orphans}: their reference URLs were
+not returned by the author-based search, meaning the linked issues are either deleted or could
+not be confirmed as filed by Anshunkang Zhou.
+
+\paragraph{Why 188 bugs, not 192.}
+The author-based search returned zero results for four KRAKEN projects ---
+\texttt{advancecomp}, \texttt{jhead}, \texttt{nasm}, and \texttt{sox} --- accounting for the
+four-bug gap between our dataset and the paper's count.
+Bug reports for those projects may have been filed under a different identifier or have since
+been removed from their respective trackers.
+
+\input{generated/table_comparison}
+
+%----------------------------------------------------------------------
 \end{document}

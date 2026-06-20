@@ -1,11 +1,12 @@
 import re
-import httpx
+
+from github_client import github_get
 
 README_URL = "https://raw.githubusercontent.com/seviezhou/Kraken/main/README.md"
 
 
 def fetch_cve_list() -> list[str]:
-    response = httpx.get(README_URL, follow_redirects=True)
+    response = github_get(README_URL)
     response.raise_for_status()
     return _parse_cve_list(response.text)
 

@@ -3,6 +3,8 @@ from pathlib import Path
 
 import httpx
 
+from github_client import github_client, github_get
+
 CVELISTV5_RAW = "https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves"
 CACHE_DIR = Path(__file__).parent.parent / "cache"
 
@@ -27,7 +29,7 @@ def fetch_all(cve_ids: list[str], *, refresh: bool = False) -> dict[str, str]:
     CACHE_DIR.mkdir(exist_ok=True)
     results: dict[str, str] = {}
 
-    with httpx.Client(follow_redirects=True, timeout=30) as client:
+    with github_client() as client:
         for cve_id in cve_ids:
             json_path = CACHE_DIR / f"{cve_id}.json"
             missing_path = CACHE_DIR / f"{cve_id}.missing"

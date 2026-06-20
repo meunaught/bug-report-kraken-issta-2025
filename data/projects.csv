@@ -1,38 +1,38 @@
-project,version,bugs,cves,platform
-advancecomp,2.1,3,0,---
-asn1c,0.9.28,4,0,---
-bento4,1.6.0,6,4,GitHub Issues
-cpp-peglib,0.1.12,2,2,GitHub Issues
-dmg2img,20170502,7,2,Red Hat Bugzilla
-faad2,2.10.0,6,6,GitHub Issues
-fast_ber,0.4,1,1,GitHub Issues
-faust,2.30.5,1,1,GitHub Issues
-ffmpeg,n4.5-dev,3,1,FFmpeg Trac
-fig2dev,20200520,1,1,SourceForge
-giflib,5.1.4,1,1,SourceForge
-gocr,0.53,4,3,Bugzilla + SourceForge
-gpac,20200801,12,9,GitHub Issues
-gravity,0.8.1,7,5,GitHub Issues
-hcxtools,6.1.6,1,1,GitHub Issues
-heif,3.6.2,4,3,GitHub Issues
-jhead,3.04-2,2,0,---
-json-c,0.15,1,1,GitHub Issues
-libelfin,20200729,1,1,GitHub Issues
-libgig,20200507,1,1,GitHub Issues
-libiff,20190123,2,1,GitHub Issues
-libjpeg,2020021,19,7,GitHub Issues
-libmaxminddb,1.4.2,1,1,GitHub Issues
-libnsfdb,20200714,3,0,---
-libraw,0.20.2,3,1,GitHub Issues
-libredwg,0.10.1.3751,12,9,GitHub Issues
-libslax,v0.22.1,4,4,GitHub Issues
-libxsmm,v1.16.1,5,2,GitHub Issues
-lief,0.11.4,1,1,GitHub Issues
-nasm,2.15,2,0,---
-ncurses,6.2,2,1,GNU Mailing List
-pbrt,20200627,1,1,GitHub Issues
-pdftools,20200714,6,6,GitHub Issues
-retdec,3.3,1,1,GitHub Issues
-sela,20200412,9,9,GitHub Issues
-sox,14.4.2,3,0,---
-swftools,20200710,50,32,GitHub Issues
+project,platform
+advancecomp,---
+asn1c,GitHub Issues
+bento4,GitHub Issues
+cpp-peglib,GitHub Issues
+dmg2img,Red Hat Bugzilla
+faad2,GitHub Issues
+fast_ber,GitHub Issues
+faust,GitHub Issues
+ffmpeg,FFmpeg Trac
+fig2dev,SourceForge
+giflib,SourceForge
+gocr,Bugzilla + SourceForge
+gpac,GitHub Issues
+gravity,GitHub Issues
+hcxtools,GitHub Issues
+heif,GitHub Issues
+jhead,---
+json-c,GitHub Issues
+libelfin,GitHub Issues
+libgig,GitHub Issues
+libiff,GitHub Issues
+libjpeg,GitHub Issues
+libmaxminddb,GitHub Issues
+libnsfdb,GitHub Issues
+libraw,GitHub Issues
+libredwg,GitHub Issues
+libslax,GitHub Issues
+libxsmm,GitHub Issues
+lief,GitHub Issues
+nasm,---
+ncurses,GNU Mailing List
+pbrt-v3,GitHub Issues
+pdftools,GitHub Issues
+retdec,GitHub Issues
+sela,GitHub Issues
+sox,---
+swftools,GitHub Issues
