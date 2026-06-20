@@ -16,15 +16,17 @@ DATA_DIR = Path(__file__).parent.parent / "data" / "generated"
 AUTHOR_NAME     = "Anshunkang Zhou"
 GITHUB_USERNAME = "seviezhou"
 SF_USERNAME     = "azhouad"
+SF_USERNAMES    = {SF_USERNAME, "zhouhan"}  # additional SF identity for advancecomp
 TRAC_USERNAME   = "seviezhou"   # confirmed from existing cves.csv entries
 
 # (sf_project, sf_tracker, internal_project_name)
 # SF project slugs differ from our internal names.
 SF_PROJECTS: list[tuple[str, str, str]] = [
-    ("giflib", "bugs",    "giflib"),
-    ("jocr",   "bugs",    "gocr"),
-    ("mcj",    "tickets", "fig2dev"),
-    ("sox",    "bugs",    "sox"),
+    ("giflib",       "bugs",    "giflib"),
+    ("jocr",         "bugs",    "gocr"),
+    ("mcj",          "tickets", "fig2dev"),
+    ("sox",          "bugs",    "sox"),
+    ("advancemame",  "bugs",    "advancecomp"),
 ]
 
 # Red Hat Bugzilla IDs confirmed to be from Anshunkang Zhou.
@@ -131,13 +133,14 @@ def search_sourceforge() -> list[BugResult]:
         print(f"    {sf_project}/{sf_tracker}: {len(nums)} tickets, fetching each...")
 
         for num in nums:
-            if _sf_reported_by(sf_project, sf_tracker, num) == SF_USERNAME:
+            reporter = _sf_reported_by(sf_project, sf_tracker, num)
+            if reporter in SF_USERNAMES:
                 url = f"https://sourceforge.net/p/{sf_project}/{sf_tracker}/{num}"
                 results.append(BugResult(
                     project=internal,
                     bug_url=url,
                     label=f"SF #{num}",
-                    author=SF_USERNAME,
+                    author=reporter,
                 ))
 
     return results
