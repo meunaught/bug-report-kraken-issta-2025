@@ -17,12 +17,13 @@
 \bottomrule
 \endlastfoot
 {% for row in rows %}
-{{ row.display_name }} & {{ row.paper_bugs }} & {{ row.found_bugs }}{% if row.found_bugs < row.paper_bugs %}\textsuperscript{$\star$}{% endif %} & {{ row.paper_cves }} & {{ row.found_cves }}{% if row.found_cves < row.paper_cves %}\textsuperscript{$\dagger$}{% endif %} \\
+{{ row.display_name }} & {{ row.paper_bugs }} & {{ row.found_bugs }}{% if row.found_bugs < row.paper_bugs %}\textsuperscript{$\star$}{% elif row.found_bugs > row.paper_bugs %}\textsuperscript{$\uparrow$}{% endif %} & {{ row.paper_cves }} & {{ row.found_cves }}{% if row.found_cves < row.paper_cves %}\textsuperscript{$\dagger$}{% endif %} \\
 {% endfor %}
 \midrule
 \textbf{Total} & \textbf{ {{- rows|sum(attribute='paper_bugs') -}} } & \textbf{ {{- rows|sum(attribute='found_bugs') -}} } & \textbf{ {{- rows|sum(attribute='paper_cves') -}} } & \textbf{ {{- rows|sum(attribute='found_cves') -}} } \\
 \end{longtable}
 \smallskip
 \noindent
-\textsuperscript{$\star$} Fewer bugs found than claimed. \quad
+\textsuperscript{$\star$} Fewer bugs found than claimed (likely deleted or filed under unknown identity). \quad
+\textsuperscript{$\uparrow$} More bugs found than claimed (author-search may include issues outside the paper's experiment window). \quad
 \textsuperscript{$\dagger$} Fewer CVEs confirmed than claimed.

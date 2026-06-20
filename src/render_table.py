@@ -220,13 +220,18 @@ def compute_orphans(cve_ids: list[str], joined_rows: list[Row]) -> list[OrphanRo
                 m = re.search(r"github\.com/[^/]+/([^/]+)", ref.url)
                 proj = m.group(1).lower() if m else ""
                 display = _DISPLAY_NAME.get(proj) or tex_escape(proj) if proj else "ncurses"
+                # For GNU mailing list posts include the year-month from the URL as the label.
+                label = ref.label
+                ml_m = re.search(r"/(\d{4}-\d{2})/", ref.url)
+                if ml_m:
+                    label = f"ML Post ({ml_m.group(1)})"
                 orphans.append(OrphanRow(
                     cve_id=cve_id,
                     json_url=cve_json_url(cve_id),
                     project=proj or "ncurses",
                     display_name=display,
                     bug_url=ref.url,
-                    label=tex_escape(ref.label),
+                    label=tex_escape(label),
                 ))
     orphans.sort(key=lambda r: (r.project, r.cve_id))
     return orphans

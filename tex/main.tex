@@ -105,7 +105,7 @@ are run in parallel and then joined on the bug report URL to produce the final d
 %% ── Output ────────────────────────────────────────────────────────
 \node[ok, below=0.6cm of join] (out)
     {\textbf{188 bug reports} across 31 of 37 KRAKEN projects
-     \quad|\quad 113 with CVE \quad|\quad 75 without CVE};
+     \quad|\quad 113 bugs linked to a CVE (105 unique CVEs) \quad|\quad 75 without CVE};
 
 %% ── Arrows ────────────────────────────────────────────────────────
 \draw[cvearr]  (readme) -- node[above,sloped,font=\small]{CVE IDs} (json);
@@ -202,7 +202,7 @@ remainder.
     \item ffmpeg has 1 CVE but that CVE references 3 separate Trac tickets (\#8845, \#8859, \#8860).
     \item gpac and libredwg each report 9 CVEs; one CVE per project could not be fetched from
           the CVEProject database (\texttt{CVE-2020-23927} and \texttt{CVE-2020-20817} respectively).
-    \item 6 projects with 0 CVEs account for 14 bugs with no confirmed links.
+    \item 4 projects (\texttt{asn1c}, \texttt{libelfin}, \texttt{libnsfdb}, \texttt{libraw}) have 0 confirmed CVEs, accounting for 11 bugs with no CVE link.
 \end{itemize}
 
 %----------------------------------------------------------------------
@@ -247,24 +247,36 @@ absent from the author's live bug tracker activity. Each entry falls into one of
 Table~\ref{tab:comparison} compares per-project bug and CVE counts from the KRAKEN supplement
 material (Table~1) against what this pipeline was able to confirm.
 Overall, the pipeline recovered \textbf{188 of the 192 bug reports} and confirmed
-\textbf{105 of the 117 resolvable CVEs} (covering 113 CVE-linked rows in Table~\ref{tab:cves}).
+\textbf{105 of the 117 resolvable CVEs}.
 
-\paragraph{Why 113 CVE-linked rows, not 117.}
+\paragraph{Why 105 confirmed CVEs, not 117.}
 Of the 119 CVE IDs listed in the KRAKEN trophy section, two
 (\texttt{CVE-2020-23927} and \texttt{CVE-2020-20817}) have no record in the CVEProject
 database, leaving 117 resolvable CVEs.
-Of those, 105 unique CVEs were traced to bug reports found in the author search and appear in
-Table~\ref{tab:cves} (some CVEs reference multiple tickets, yielding 113 rows in total).
-The remaining 12 CVEs are represented in Table~\ref{tab:orphans}: their reference URLs were
-not returned by the author-based search, meaning the linked issues are either deleted or could
-not be confirmed as filed by Anshunkang Zhou.
+Of those, \textbf{105 unique CVEs} were traced to bug reports found in the author search
+(Table~\ref{tab:cves}).
+Because some CVEs reference multiple tickets --- e.g.\ \texttt{CVE-2020-24995} covers three
+FFmpeg Trac tickets, and several gocr CVEs appear in both SourceForge and Bugzilla ---
+the 105 confirmed CVEs expand to \textbf{113 rows} in Table~\ref{tab:cves}.
+The remaining \textbf{12 unique CVEs} are represented in Table~\ref{tab:orphans} as 13 rows
+(one ncurses CVE references two separate mailing-list posts).
+Taken together: $105 + 12 = 117$ unique CVEs accounted for.
 
 \paragraph{Why 188 bugs, not 192.}
-The author-based search returned zero results for four KRAKEN projects ---
-\texttt{advancecomp}, \texttt{jhead}, \texttt{nasm}, and \texttt{sox} --- accounting for the
-four-bug gap between our dataset and the paper's count.
-Bug reports for those projects may have been filed under a different identifier or have since
-been removed from their respective trackers.
+The net gap of 4 is the result of two opposing effects, not a simple shortfall.
+Six KRAKEN projects returned zero results in the author search, collectively accounting for
+18 missing bugs:
+\begin{itemize}[nosep]
+  \item \texttt{advancecomp} (3), \texttt{jhead} (2), \texttt{nasm} (2), \texttt{sox} (3) ---
+        no tracker activity found under any known author identifier.
+  \item \texttt{ncurses} (2), \texttt{pdftools} (6) --- bugs exist in CVE JSON references
+        (Table~\ref{tab:orphans}) but could not be confirmed in the live author search.
+\end{itemize}
+Against this, five projects returned \emph{more} results than the paper claims, adding
+14 extra bugs: \texttt{dmg2img} ($+2$), \texttt{gocr} ($+3$), \texttt{libslax} ($+1$),
+\texttt{retdec} ($+7$), \texttt{sela} ($+1$).
+These likely reflect issues filed by the same author outside the paper's experiment window.
+The net effect is $192 - 18 + 14 = 188$.
 
 \input{generated/table_comparison}
 
