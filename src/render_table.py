@@ -129,9 +129,6 @@ class SummaryRow:
     platform: str
     paper_bugs: int
     found_bugs: int
-    paper_cves: int
-    found_cves: int
-    without_cve: int
 
 
 def render_summary() -> None:
@@ -140,19 +137,11 @@ def render_summary() -> None:
         for p in csv.DictReader(f):
             platform_map[p["project"]] = p["platform"]
 
-    bugs_with: dict[str, set[str]]    = {}
-    bugs_without: dict[str, set[str]] = {}
-    cves_found: dict[str, set[str]]   = {}
+    found_bugs: dict[str, set[str]] = {}
 
     with JOINED_CSV.open() as f:
         for r in csv.DictReader(f):
-            proj = r["project"]
-            url  = r["bug_url"]
-            if r["cve_id"]:
-                bugs_with.setdefault(proj, set()).add(url)
-                cves_found.setdefault(proj, set()).add(r["cve_id"])
-            else:
-                bugs_without.setdefault(proj, set()).add(url)
+            found_bugs.setdefault(r["project"], set()).add(r["bug_url"])
 
     all_projects = sorted(
         platform_map.keys(),
@@ -161,17 +150,12 @@ def render_summary() -> None:
 
     rows: list[SummaryRow] = []
     for proj in all_projects:
-        with_set    = bugs_with.get(proj, set())
-        without_set = bugs_without.get(proj, set()) - with_set
-        paper_bugs, paper_cves = _PAPER_STATS.get(proj, (0, 0))
+        paper_bugs, _ = _PAPER_STATS.get(proj, (0, 0))
         rows.append(SummaryRow(
             display_name=_DISPLAY_NAME.get(proj) or tex_escape(proj),
             platform=tex_escape(platform_map.get(proj, "GitHub Issues")),
             paper_bugs=paper_bugs,
-            found_bugs=len(with_set) + len(without_set),
-            paper_cves=paper_cves,
-            found_cves=len(cves_found.get(proj, set())),
-            without_cve=len(without_set),
+            found_bugs=len(found_bugs.get(proj, set())),
         ))
 
     env = _jinja_env()
@@ -230,8 +214,12 @@ def compute_orphans(cve_ids: list[str], joined_rows: list[Row]) -> list[OrphanRo
 
 def render_orphans(cve_ids: list[str], joined_rows: list[Row]) -> None:
     orphans = compute_orphans(cve_ids, joined_rows)
+    unique_cves = len({r.cve_id for r in orphans})
     env = _jinja_env()
-    output = env.get_template("table_orphan_cves.tex.j2").render(orphans=orphans)
+    output = env.get_template("table_orphan_cves.tex.j2").render(
+        orphans=orphans,
+        unique_cves=unique_cves,
+    )
     ORPHAN_PATH.write_text(output)
     print(f"Written {len(orphans)} orphan CVE rows → {ORPHAN_PATH}")
 
@@ -243,12 +231,14 @@ def render(cve_ids: list[str]) -> None:
     rows = build_rows()
     total_bugs = len({r.bug_url for r in rows})
     total_with_cve = sum(1 for r in rows if r.cve_id)
+    unique_cves = len({r.cve_id for r in rows if r.cve_id})
     groups = group_rows(rows)
 
     env = _jinja_env()
     output = env.get_template("table_cves.tex.j2").render(
         groups=groups,
         total_cves=total_with_cve,
+        unique_cves=unique_cves,
         total_bugs=total_bugs,
     )
 

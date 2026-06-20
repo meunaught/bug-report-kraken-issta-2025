@@ -85,8 +85,8 @@ are run in parallel and then joined on the bug report URL to produce the final d
 \node[cvebox, below left=1.4cm and 2.3cm of readme] (json)
     {CVEProject/cvelistV5\\fetch JSON per CVE ID};
 \node[cvebox, below=of json] (refs)
-    {Extract \texttt{references} field\\$\rightarrow$ bug report URL\\
-     {\small\textbf{117\,/\,119 CVEs resolved}}};
+    {Extract \texttt{references} field\\$\rightarrow$ candidate bug URLs\\
+     {\small\textbf{117\,/\,119 CVEs with JSON records}}};
 
 %% ── Author path (right) ───────────────────────────────────────────
 \node[authbox, below right=1.4cm and 2.3cm of readme] (identity)
@@ -105,7 +105,7 @@ are run in parallel and then joined on the bug report URL to produce the final d
 %% ── Output ────────────────────────────────────────────────────────
 \node[ok, below=0.6cm of join] (out)
     {\textbf{191 bug reports} across 32 of 37 KRAKEN projects
-     \quad|\quad 113 bugs linked to a CVE (105 unique CVEs) \quad|\quad 78 without CVE};
+     \quad|\quad 113 bugs linked to a CVE (105 unique CVEs) \quad|\quad 78 without a CVE};
 
 %% ── Arrows ────────────────────────────────────────────────────────
 \draw[cvearr]  (readme) -- node[above,sloped,font=\small]{CVE IDs} (json);
@@ -129,7 +129,8 @@ are run in parallel and then joined on the bug report URL to produce the final d
 \end{tikzpicture}
 \caption{Search process for locating KRAKEN bug reports.
   \textcolor{blue!55!black}{\textbf{Blue:}} CVE-based path --- 119 CVE IDs fetched from
-  the CVEProject JSON database; 117 bug report URLs resolved.
+  the KRAKEN README; 117 have JSON records in the CVEProject database, from which
+  candidate bug report URLs are extracted via the \texttt{references} field.
   \textcolor{green!45!black}{\textbf{Green:}} Author-based path --- bug tracker accounts
   of the first author queried across GitHub, FFmpeg Trac, SourceForge, and Bugzilla.
   \textcolor{purple!60!black}{\textbf{Purple:}} Results joined on \texttt{bug\_url} to
@@ -183,7 +184,7 @@ Red Hat Bugzilla  & Anshunkang Zhou       & Known bug IDs confirmed by acknowled
 The two result sets are joined on the bug report URL (after stripping any
 \texttt{\#fragment} suffix). A left join from the author-search results onto the CVE
 records attaches a CVE ID to each bug where one exists, leaving the field blank otherwise.
-The final dataset contains \textbf{191 bug reports} across 32 of 37 KRAKEN projects: 113 with a CVE ID and 78 without.
+The final dataset contains \textbf{191 bug reports} across 32 of 37 KRAKEN projects.
 
 %----------------------------------------------------------------------
 \section{Summary by Project}
@@ -191,9 +192,9 @@ The final dataset contains \textbf{191 bug reports} across 32 of 37 KRAKEN proje
 
 Table~\ref{tab:summary} covers all 37 KRAKEN projects, comparing what the paper's supplement
 material (Table~1) reports against what this pipeline confirmed.
-\textbf{Found bugs} is the total number of issues located under the author's known identifiers;
-\textbf{Found CVEs} is the number of unique CVE IDs confirmed;
-\textbf{Without CVE} counts bug reports that could not be linked to any CVE.
+\textbf{Found bugs} is the total number of issues located under the author's known identifiers.
+Of the 191 found, 113 are linked to a CVE (105 unique CVEs) and 78 are not;
+CVE details are in Table~\ref{tab:cves}.
 
 \input{generated/table_summary}
 
@@ -244,39 +245,14 @@ absent from the author's live bug tracker activity. Each entry falls into one of
 \section{Conclusion}
 \label{sec:conclusion}
 
-Table~\ref{tab:summary} (Section~\ref{sec:summary}) compares per-project bug and CVE counts
-from the KRAKEN supplement material against what this pipeline confirmed.
-Overall, the pipeline recovered \textbf{191 of the 192 bug reports} and confirmed
-\textbf{105 of the 117 resolvable CVEs}.
+The pipeline recovered \textbf{191 of the 192 bug reports} across 32 of 37 KRAKEN projects
+and confirmed \textbf{105 of the 117 resolvable CVEs} (2 of the 119 KRAKEN CVEs have no
+CVEProject record; 12 others appear only in CVE JSON references, not in the author search).
 
-\paragraph{Why 105 confirmed CVEs, not 117.}
-Of the 119 CVE IDs listed in the KRAKEN trophy section, two
-(\texttt{CVE-2020-23927} and \texttt{CVE-2020-20817}) have no record in the CVEProject
-database, leaving 117 resolvable CVEs.
-Of those, \textbf{105 unique CVEs} were traced to bug reports found in the author search
-(Table~\ref{tab:cves}).
-Because some CVEs reference multiple tickets --- e.g.\ \texttt{CVE-2020-24995} covers three
-FFmpeg Trac tickets, and several gocr CVEs appear in both SourceForge and Bugzilla ---
-the 105 confirmed CVEs expand to \textbf{113 rows} in Table~\ref{tab:cves}.
-The remaining \textbf{12 unique CVEs} are represented in Table~\ref{tab:orphans} as 13 rows
-(one ncurses CVE references two separate mailing-list posts).
-Taken together: $105 + 12 = 117$ unique CVEs accounted for.
-
-\paragraph{Why 191 bugs, not 192.}
-The net gap of 1 is the result of two opposing effects, not a simple shortfall.
-Five KRAKEN projects returned zero results in the author search, collectively accounting for
-15 missing bugs:
-\begin{itemize}[nosep]
-  \item \texttt{advancecomp} (3), \texttt{jhead} (2), \texttt{nasm} (2) ---
-        no tracker activity found under any known author identifier.
-  \item \texttt{ncurses} (2), \texttt{pdftools} (6) --- bugs exist in CVE JSON references
-        (Table~\ref{tab:orphans}) but could not be confirmed in the live author search.
-\end{itemize}
-Against this, five projects returned \emph{more} results than the paper claims, adding
-14 extra bugs: \texttt{dmg2img} ($+2$), \texttt{gocr} ($+3$), \texttt{libslax} ($+1$),
-\texttt{retdec} ($+7$), \texttt{sela} ($+1$).
-These likely reflect issues filed by the same author outside the paper's experiment window.
-The net effect is $192 - 15 + 14 = 191$.
+The one-bug shortfall ($192 - 15 + 14 = 191$) reflects two opposing effects:
+five projects yielded no results (15 bugs missing), while five others returned more issues
+than the paper claims, adding 14 bugs likely filed outside the experiment window.
+The 12 unmatched CVEs (\texttt{ncurses}, \texttt{pdftools}) appear in Table~\ref{tab:orphans}.
 
 %----------------------------------------------------------------------
 \end{document}

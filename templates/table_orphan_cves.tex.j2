@@ -20,4 +20,6 @@
 {% endif %}
 {{ row.display_name if row.project != orphans[loop.index0 - 1].project or loop.first else '' }} & \href{ {{- row.bug_url -}} }{ {{- row.label -}} } & \href{ {{- row.json_url -}} }{\texttt{ {{- row.cve_id -}} }} \\
 {% endfor %}
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Total}} & \textbf{ {{- unique_cves }} unique CVEs ({{ orphans|length }} rows)} \\
 \end{longtable}

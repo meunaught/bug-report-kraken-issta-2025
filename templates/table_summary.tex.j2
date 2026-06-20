@@ -1,4 +1,4 @@
-\begin{longtable}{@{}lp{3.4cm}rrrrr@{}}
+\begin{longtable}{@{}lp{3.4cm}rr@{}}
 \caption{Bug reports filed by Anshunkang Zhou across all 37 KRAKEN projects, compared
   against the KRAKEN supplement (Table~1).
   \emph{Found} counts reflect only bugs confirmed under the author's known identifiers.}
@@ -6,31 +6,24 @@
 \toprule
 \textbf{Project} & \textbf{Platform} &
 \textbf{\shortstack[r]{Paper\\bugs}} &
-\textbf{\shortstack[r]{Found\\bugs}} &
-\textbf{\shortstack[r]{Paper\\CVEs}} &
-\textbf{\shortstack[r]{Found\\CVEs}} &
-\textbf{\shortstack[r]{Without\\CVE}} \\
+\textbf{\shortstack[r]{Found\\bugs}} \\
 \midrule
 \endfirsthead
-\multicolumn{7}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
+\multicolumn{4}{c}{\small\textit{(Table \ref{tab:summary} continued)}} \\
 \toprule
 \textbf{Project} & \textbf{Platform} &
 \textbf{\shortstack[r]{Paper\\bugs}} &
-\textbf{\shortstack[r]{Found\\bugs}} &
-\textbf{\shortstack[r]{Paper\\CVEs}} &
-\textbf{\shortstack[r]{Found\\CVEs}} &
-\textbf{\shortstack[r]{Without\\CVE}} \\
+\textbf{\shortstack[r]{Found\\bugs}} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
 {% for row in rows %}
-{{ row.display_name }} & {{ row.platform }} & {{ row.paper_bugs }} & {{ row.found_bugs }}{% if row.found_bugs < row.paper_bugs %}\textsuperscript{$\star$}{% elif row.found_bugs > row.paper_bugs %}\textsuperscript{$\uparrow$}{% endif %} & {{ row.paper_cves }} & {{ row.found_cves }}{% if row.found_cves < row.paper_cves %}\textsuperscript{$\dagger$}{% endif %} & {{ row.without_cve }} \\
+{{ row.display_name }} & {{ row.platform }} & {{ row.paper_bugs }} & {{ row.found_bugs }}{% if row.found_bugs < row.paper_bugs %}\textsuperscript{$\star$}{% elif row.found_bugs > row.paper_bugs %}\textsuperscript{$\uparrow$}{% endif %} \\
 {% endfor %}
 \midrule
-\textbf{Total} & & \textbf{ {{- rows|sum(attribute='paper_bugs') -}} } & \textbf{ {{- rows|sum(attribute='found_bugs') -}} } & \textbf{ {{- rows|sum(attribute='paper_cves') -}} } & \textbf{ {{- rows|sum(attribute='found_cves') -}} } & \textbf{ {{- rows|sum(attribute='without_cve') -}} } \\
+\textbf{Total} & & \textbf{ {{- rows|sum(attribute='paper_bugs') -}} } & \textbf{ {{- rows|sum(attribute='found_bugs') -}} } \\
 \end{longtable}
 \smallskip\noindent
 \textsuperscript{$\star$}~Fewer bugs found than claimed (deleted or filed under unknown identity).\quad
-\textsuperscript{$\uparrow$}~More bugs found than claimed (may include issues outside the paper's experiment window).\quad
-\textsuperscript{$\dagger$}~Fewer CVEs confirmed than claimed.
+\textsuperscript{$\uparrow$}~More bugs found than claimed (may include issues outside the paper's experiment window).

@@ -18,4 +18,6 @@
 {% endfor %}
 {% if not loop.last %}\midrule{% endif %}
 {% endfor %}
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Total}} & \textbf{ {{- unique_cves }} unique CVEs ({{ total_cves }} rows)} \\
 \end{longtable}
