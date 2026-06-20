@@ -13,8 +13,7 @@ PROJECTS_CSV  = DATA_DIR / "projects.csv"
 OUTPUT_DIR    = Path(__file__).parent.parent / "tex" / "generated"
 OUTPUT_PATH   = OUTPUT_DIR / "table_cves.tex"
 SUMMARY_PATH  = OUTPUT_DIR / "table_summary.tex"
-ORPHAN_PATH      = OUTPUT_DIR / "table_orphan_cves.tex"
-COMPARISON_PATH  = OUTPUT_DIR / "table_comparison.tex"
+ORPHAN_PATH   = OUTPUT_DIR / "table_orphan_cves.tex"
 
 # Per-project bug and CVE counts as reported in the KRAKEN supplement material (Table 1).
 # Key: our internal project key; value: (paper_bugs, paper_cves).
@@ -127,22 +126,23 @@ def _jinja_env() -> Environment:
 @dataclass
 class SummaryRow:
     display_name: str
-    bugs_filed: int
-    with_cve: int
-    without_cve: int
     platform: str
+    paper_bugs: int
+    found_bugs: int
+    paper_cves: int
+    found_cves: int
+    without_cve: int
 
 
 def render_summary() -> None:
-    # Load platform info from static projects.csv (fallback: GitHub Issues).
     platform_map: dict[str, str] = {}
     with PROJECTS_CSV.open() as f:
         for p in csv.DictReader(f):
             platform_map[p["project"]] = p["platform"]
 
-    # Aggregate joined.csv: per project, count unique bug_urls with/without CVE.
     bugs_with: dict[str, set[str]]    = {}
     bugs_without: dict[str, set[str]] = {}
+    cves_found: dict[str, set[str]]   = {}
 
     with JOINED_CSV.open() as f:
         for r in csv.DictReader(f):
@@ -150,45 +150,36 @@ def render_summary() -> None:
             url  = r["bug_url"]
             if r["cve_id"]:
                 bugs_with.setdefault(proj, set()).add(url)
+                cves_found.setdefault(proj, set()).add(r["cve_id"])
             else:
                 bugs_without.setdefault(proj, set()).add(url)
 
     all_projects = sorted(
-        bugs_with.keys() | bugs_without.keys(),
+        platform_map.keys(),
         key=lambda p: _DISPLAY_NAME.get(p, p).lower(),
     )
 
-    summary_rows: list[SummaryRow] = []
+    rows: list[SummaryRow] = []
     for proj in all_projects:
         with_set    = bugs_with.get(proj, set())
-        without_set = bugs_without.get(proj, set())
-        # A bug that matched a CVE should not also count as without-CVE.
-        without_set -= with_set
-        # _DISPLAY_NAME values are already LaTeX-formatted; only escape raw keys.
-        display_name = _DISPLAY_NAME.get(proj) or tex_escape(proj)
-        summary_rows.append(SummaryRow(
-            display_name=display_name,
-            bugs_filed=len(with_set) + len(without_set),
-            with_cve=len(with_set),
-            without_cve=len(without_set),
+        without_set = bugs_without.get(proj, set()) - with_set
+        paper_bugs, paper_cves = _PAPER_STATS.get(proj, (0, 0))
+        rows.append(SummaryRow(
+            display_name=_DISPLAY_NAME.get(proj) or tex_escape(proj),
             platform=tex_escape(platform_map.get(proj, "GitHub Issues")),
+            paper_bugs=paper_bugs,
+            found_bugs=len(with_set) + len(without_set),
+            paper_cves=paper_cves,
+            found_cves=len(cves_found.get(proj, set())),
+            without_cve=len(without_set),
         ))
 
-    total_filed   = sum(r.bugs_filed  for r in summary_rows)
-    total_with    = sum(r.with_cve    for r in summary_rows)
-    total_without = sum(r.without_cve for r in summary_rows)
-
     env = _jinja_env()
-    output = env.get_template("table_summary.tex.j2").render(
-        rows=summary_rows,
-        total_filed=total_filed,
-        total_with=total_with,
-        total_without=total_without,
-    )
+    output = env.get_template("table_summary.tex.j2").render(rows=rows)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     SUMMARY_PATH.write_text(output)
-    print(f"Written {len(summary_rows)} projects → {SUMMARY_PATH}")
+    print(f"Written {len(rows)} projects → {SUMMARY_PATH}")
 
 
 @dataclass
@@ -237,41 +228,6 @@ def compute_orphans(cve_ids: list[str], joined_rows: list[Row]) -> list[OrphanRo
     return orphans
 
 
-@dataclass
-class ComparisonRow:
-    display_name: str
-    paper_bugs: int
-    found_bugs: int
-    paper_cves: int
-    found_cves: int
-
-
-def render_comparison(rows: list[Row]) -> None:
-    # Per-project counts from our data.
-    found_bugs: dict[str, set[str]] = {}
-    found_cves: dict[str, set[str]] = {}
-    for r in rows:
-        found_bugs.setdefault(r.project_key, set()).add(r.bug_url)
-        if r.cve_id:
-            found_cves.setdefault(r.project_key, set()).add(r.cve_id)
-
-    comp_rows: list[ComparisonRow] = []
-    for proj, (paper_bugs, paper_cves) in sorted(_PAPER_STATS.items()):
-        display = _DISPLAY_NAME.get(proj) or tex_escape(proj)
-        comp_rows.append(ComparisonRow(
-            display_name=display,
-            paper_bugs=paper_bugs,
-            found_bugs=len(found_bugs.get(proj, set())),
-            paper_cves=paper_cves,
-            found_cves=len(found_cves.get(proj, set())),
-        ))
-
-    env = _jinja_env()
-    output = env.get_template("table_comparison.tex.j2").render(rows=comp_rows)
-    COMPARISON_PATH.write_text(output)
-    print(f"Written {len(comp_rows)} comparison rows → {COMPARISON_PATH}")
-
-
 def render_orphans(cve_ids: list[str], joined_rows: list[Row]) -> None:
     orphans = compute_orphans(cve_ids, joined_rows)
     env = _jinja_env()
@@ -302,7 +258,6 @@ def render(cve_ids: list[str]) -> None:
 
     render_summary()
     render_orphans(cve_ids, rows)
-    render_comparison(rows)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 project,platform
-advancecomp,---
+advancecomp,GitHub Issues
 asn1c,GitHub Issues
 bento4,GitHub Issues
 cpp-peglib,GitHub Issues
@@ -15,7 +15,7 @@ gpac,GitHub Issues
 gravity,GitHub Issues
 hcxtools,GitHub Issues
 heif,GitHub Issues
-jhead,---
+jhead,GitHub Issues
 json-c,GitHub Issues
 libelfin,GitHub Issues
 libgig,GitHub Issues
@@ -28,11 +28,11 @@ libredwg,GitHub Issues
 libslax,GitHub Issues
 libxsmm,GitHub Issues
 lief,GitHub Issues
-nasm,---
+nasm,Bugzilla
 ncurses,GNU Mailing List
 pbrt-v3,GitHub Issues
 pdftools,GitHub Issues
 retdec,GitHub Issues
 sela,GitHub Issues
-sox,---
+sox,SourceForge
 swftools,GitHub Issues

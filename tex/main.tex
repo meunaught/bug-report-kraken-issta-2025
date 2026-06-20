@@ -104,8 +104,8 @@ are run in parallel and then joined on the bug report URL to produce the final d
 
 %% ── Output ────────────────────────────────────────────────────────
 \node[ok, below=0.6cm of join] (out)
-    {\textbf{188 bug reports} across 31 of 37 KRAKEN projects
-     \quad|\quad 113 bugs linked to a CVE (105 unique CVEs) \quad|\quad 75 without CVE};
+    {\textbf{191 bug reports} across 32 of 37 KRAKEN projects
+     \quad|\quad 113 bugs linked to a CVE (105 unique CVEs) \quad|\quad 78 without CVE};
 
 %% ── Arrows ────────────────────────────────────────────────────────
 \draw[cvearr]  (readme) -- node[above,sloped,font=\small]{CVE IDs} (json);
@@ -133,7 +133,7 @@ are run in parallel and then joined on the bug report URL to produce the final d
   \textcolor{green!45!black}{\textbf{Green:}} Author-based path --- bug tracker accounts
   of the first author queried across GitHub, FFmpeg Trac, SourceForge, and Bugzilla.
   \textcolor{purple!60!black}{\textbf{Purple:}} Results joined on \texttt{bug\_url} to
-  produce the final dataset of 188 unique bug reports across 31 of 37 KRAKEN projects.}
+  produce the final dataset of 191 unique bug reports across 32 of 37 KRAKEN projects.}
 \label{fig:flowchart}
 \end{figure}
 
@@ -183,17 +183,17 @@ Red Hat Bugzilla  & Anshunkang Zhou       & Known bug IDs confirmed by acknowled
 The two result sets are joined on the bug report URL (after stripping any
 \texttt{\#fragment} suffix). A left join from the author-search results onto the CVE
 records attaches a CVE ID to each bug where one exists, leaving the field blank otherwise.
-The final dataset contains \textbf{188 bug reports} across 31 of 37 KRAKEN projects: 113 with a CVE ID and 75 without.
+The final dataset contains \textbf{191 bug reports} across 32 of 37 KRAKEN projects: 113 with a CVE ID and 78 without.
 
 %----------------------------------------------------------------------
 \section{Summary by Project}
 \label{sec:summary}
 
-Table~\ref{tab:summary} summarises all projects where bug reports were filed by the paper's
-first author (Anshunkang Zhou), derived by joining the author's bug tracker activity with
-the KRAKEN CVE assignments. \textbf{Bugs Filed} is the total number of issues opened;
-\textbf{With CVE} counts those that received a CVE ID; \textbf{Without CVE} counts the
-remainder.
+Table~\ref{tab:summary} covers all 37 KRAKEN projects, comparing what the paper's supplement
+material (Table~1) reports against what this pipeline confirmed.
+\textbf{Found bugs} is the total number of issues located under the author's known identifiers;
+\textbf{Found CVEs} is the number of unique CVE IDs confirmed;
+\textbf{Without CVE} counts bug reports that could not be linked to any CVE.
 
 \input{generated/table_summary}
 
@@ -244,9 +244,9 @@ absent from the author's live bug tracker activity. Each entry falls into one of
 \section{Conclusion}
 \label{sec:conclusion}
 
-Table~\ref{tab:comparison} compares per-project bug and CVE counts from the KRAKEN supplement
-material (Table~1) against what this pipeline was able to confirm.
-Overall, the pipeline recovered \textbf{188 of the 192 bug reports} and confirmed
+Table~\ref{tab:summary} (Section~\ref{sec:summary}) compares per-project bug and CVE counts
+from the KRAKEN supplement material against what this pipeline confirmed.
+Overall, the pipeline recovered \textbf{191 of the 192 bug reports} and confirmed
 \textbf{105 of the 117 resolvable CVEs}.
 
 \paragraph{Why 105 confirmed CVEs, not 117.}
@@ -262,12 +262,12 @@ The remaining \textbf{12 unique CVEs} are represented in Table~\ref{tab:orphans}
 (one ncurses CVE references two separate mailing-list posts).
 Taken together: $105 + 12 = 117$ unique CVEs accounted for.
 
-\paragraph{Why 188 bugs, not 192.}
-The net gap of 4 is the result of two opposing effects, not a simple shortfall.
-Six KRAKEN projects returned zero results in the author search, collectively accounting for
-18 missing bugs:
+\paragraph{Why 191 bugs, not 192.}
+The net gap of 1 is the result of two opposing effects, not a simple shortfall.
+Five KRAKEN projects returned zero results in the author search, collectively accounting for
+15 missing bugs:
 \begin{itemize}[nosep]
-  \item \texttt{advancecomp} (3), \texttt{jhead} (2), \texttt{nasm} (2), \texttt{sox} (3) ---
+  \item \texttt{advancecomp} (3), \texttt{jhead} (2), \texttt{nasm} (2) ---
         no tracker activity found under any known author identifier.
   \item \texttt{ncurses} (2), \texttt{pdftools} (6) --- bugs exist in CVE JSON references
         (Table~\ref{tab:orphans}) but could not be confirmed in the live author search.
@@ -276,9 +276,7 @@ Against this, five projects returned \emph{more} results than the paper claims, 
 14 extra bugs: \texttt{dmg2img} ($+2$), \texttt{gocr} ($+3$), \texttt{libslax} ($+1$),
 \texttt{retdec} ($+7$), \texttt{sela} ($+1$).
 These likely reflect issues filed by the same author outside the paper's experiment window.
-The net effect is $192 - 18 + 14 = 188$.
-
-\input{generated/table_comparison}
+The net effect is $192 - 15 + 14 = 191$.
 
 %----------------------------------------------------------------------
 \end{document}

@@ -24,6 +24,7 @@ SF_PROJECTS: list[tuple[str, str, str]] = [
     ("giflib", "bugs",    "giflib"),
     ("jocr",   "bugs",    "gocr"),
     ("mcj",    "tickets", "fig2dev"),
+    ("sox",    "bugs",    "sox"),
 ]
 
 # Red Hat Bugzilla IDs confirmed to be from Anshunkang Zhou.
@@ -212,6 +213,41 @@ def search_bugzilla() -> list[BugResult]:
     return results
 
 
+# ── NASM Bugzilla ─────────────────────────────────────────────────────────────
+
+def search_nasm_bugzilla() -> list[BugResult]:
+    """Search bugzilla.nasm.us for bugs reported by seviezhou / Anshunkang Zhou."""
+    results: list[BugResult] = []
+    for reporter in (GITHUB_USERNAME, AUTHOR_NAME):
+        try:
+            r = httpx.get(
+                "https://bugzilla.nasm.us/rest/bug",
+                params={"reporter": reporter, "limit": 200},
+                follow_redirects=True, timeout=20,
+            )
+        except Exception:
+            continue
+        if r.status_code != 200:
+            continue
+        for bug in r.json().get("bugs", []):
+            bug_id = bug.get("id")
+            if bug_id:
+                results.append(BugResult(
+                    project="nasm",
+                    bug_url=f"https://bugzilla.nasm.us/show_bug.cgi?id={bug_id}",
+                    label=f"Bug #{bug_id}",
+                    author=reporter,
+                ))
+    # deduplicate by URL
+    seen: set[str] = set()
+    deduped = []
+    for r in results:
+        if r.bug_url not in seen:
+            seen.add(r.bug_url)
+            deduped.append(r)
+    return deduped
+
+
 # ── combined ──────────────────────────────────────────────────────────────────
 
 def search_all() -> list[BugResult]:
@@ -236,6 +272,11 @@ def search_all() -> list[BugResult]:
     bz = search_bugzilla()
     print(f"    {len(bz)} found")
     all_results.extend(bz)
+
+    print("  NASM Bugzilla:")
+    nasm_bz = search_nasm_bugzilla()
+    print(f"    {len(nasm_bz)} found")
+    all_results.extend(nasm_bz)
 
     return all_results
 
