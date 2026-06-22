@@ -42,7 +42,6 @@ BUGZILLA_CONFIRMED: dict[str, list[int]] = {
 class BugResult:
     project: str
     bug_url: str
-    label:   str
     author:  str
 
 
@@ -75,7 +74,6 @@ def search_github() -> list[BugResult]:
             results.append(BugResult(
                 project=_repo_name(item.get("repository_url", "")),
                 bug_url=item.get("html_url", ""),
-                label=f"Issue #{item.get('number', '')}",
                 author=GITHUB_USERNAME,
             ))
 
@@ -112,34 +110,23 @@ def _sf_all_ticket_nums(sf_project: str, sf_tracker: str) -> list[int]:
     return nums
 
 
-def _sf_reported_by(sf_project: str, sf_tracker: str, ticket_num: int) -> str:
-    try:
-        r = httpx.get(
-            f"https://sourceforge.net/rest/p/{sf_project}/{sf_tracker}/{ticket_num}",
-            follow_redirects=True, timeout=20,
-        )
-        if r.status_code == 200:
-            return r.json().get("ticket", {}).get("reported_by", "")
-    except Exception:
-        pass
-    return ""
-
-
 def search_sourceforge() -> list[BugResult]:
+    from reporter_fetcher import get_reporters
+
     results: list[BugResult] = []
 
     for sf_project, sf_tracker, internal in SF_PROJECTS:
         nums = _sf_all_ticket_nums(sf_project, sf_tracker)
         print(f"    {sf_project}/{sf_tracker}: {len(nums)} tickets, fetching each...")
 
-        for num in nums:
-            reporter = _sf_reported_by(sf_project, sf_tracker, num)
+        urls = [f"https://sourceforge.net/p/{sf_project}/{sf_tracker}/{num}" for num in nums]
+        reporters = get_reporters(urls)
+
+        for url, reporter in reporters.items():
             if reporter in SF_USERNAMES:
-                url = f"https://sourceforge.net/p/{sf_project}/{sf_tracker}/{num}"
                 results.append(BugResult(
                     project=internal,
                     bug_url=url,
-                    label=f"SF #{num}",
                     author=reporter,
                 ))
 
@@ -175,7 +162,6 @@ def search_trac() -> list[BugResult]:
             results.append(BugResult(
                 project="ffmpeg",
                 bug_url=f"https://trac.ffmpeg.org/ticket/{ticket_id}",
-                label=f"Trac #{ticket_id}",
                 author=TRAC_USERNAME,
             ))
 
@@ -206,49 +192,12 @@ def search_bugzilla() -> list[BugResult]:
     results: list[BugResult] = []
     for project, ids in BUGZILLA_CONFIRMED.items():
         for bug_id in ids:
-            url = f"https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}"
             results.append(BugResult(
                 project=project,
-                bug_url=url,
-                label=f"Bug #{bug_id}",
+                bug_url=f"https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}",
                 author=AUTHOR_NAME,
             ))
     return results
-
-
-# ── NASM Bugzilla ─────────────────────────────────────────────────────────────
-
-def search_nasm_bugzilla() -> list[BugResult]:
-    """Search bugzilla.nasm.us for bugs reported by seviezhou / Anshunkang Zhou."""
-    results: list[BugResult] = []
-    for reporter in (GITHUB_USERNAME, AUTHOR_NAME):
-        try:
-            r = httpx.get(
-                "https://bugzilla.nasm.us/rest/bug",
-                params={"reporter": reporter, "limit": 200},
-                follow_redirects=True, timeout=20,
-            )
-        except Exception:
-            continue
-        if r.status_code != 200:
-            continue
-        for bug in r.json().get("bugs", []):
-            bug_id = bug.get("id")
-            if bug_id:
-                results.append(BugResult(
-                    project="nasm",
-                    bug_url=f"https://bugzilla.nasm.us/show_bug.cgi?id={bug_id}",
-                    label=f"Bug #{bug_id}",
-                    author=reporter,
-                ))
-    # deduplicate by URL
-    seen: set[str] = set()
-    deduped = []
-    for r in results:
-        if r.bug_url not in seen:
-            seen.add(r.bug_url)
-            deduped.append(r)
-    return deduped
 
 
 # ── combined ──────────────────────────────────────────────────────────────────
@@ -276,11 +225,6 @@ def search_all() -> list[BugResult]:
     print(f"    {len(bz)} found")
     all_results.extend(bz)
 
-    print("  NASM Bugzilla:")
-    nasm_bz = search_nasm_bugzilla()
-    print(f"    {len(nasm_bz)} found")
-    all_results.extend(nasm_bz)
-
     return all_results
 
 
@@ -289,7 +233,7 @@ def write_csv(results: list[BugResult]) -> Path:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     out = DATA_DIR / "bugs_by_author.csv"
     with out.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["project", "bug_url", "label", "author"])
+        writer = csv.DictWriter(f, fieldnames=["project", "bug_url", "author"])
         writer.writeheader()
         writer.writerows(asdict(r) for r in results)
     return out

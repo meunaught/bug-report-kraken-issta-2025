@@ -3,4 +3,5 @@ jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967924,Anshunkang Zhou
 jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967971,Anshunkang Zhou
 nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392711,zhouan
 nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392716,zhouan
+ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html,Anshunkang Zhou
 ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html,Anshunkang Zhou

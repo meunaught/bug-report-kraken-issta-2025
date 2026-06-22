@@ -26,8 +26,7 @@ from pathlib import Path
 
 DATA_DIR       = Path(__file__).parent.parent / "data"
 OUTPUT_DIR     = Path(__file__).parent.parent / "output"
-GENERATED_DIR  = DATA_DIR / "generated"
-AUTHOR_CSV     = GENERATED_DIR / "bugs_by_author.csv"
+AUTHOR_CSV     = DATA_DIR / "generated" / "bugs_by_author.csv"
 HAND_CURATED   = DATA_DIR / "hand_curated.csv"
 CLASSIFIED_CSV = OUTPUT_DIR / "classified_bugs.csv"
 PROJECTS_CSV   = DATA_DIR / "projects.csv"
@@ -60,19 +59,23 @@ def _normalize(url: str) -> str:
 
 # ── Pipeline ──────────────────────────────────────────────────────────────────
 
-def _load_cve_map() -> dict[str, str]:
+def _load_cve_map() -> tuple[dict[str, str], dict[str, str]]:
     from extract_refs import extract_refs
     from fetch_cve_list import fetch_cve_list
     cve_map: dict[str, str] = {}
+    fragment_urls: dict[str, str] = {}  # norm_key → original URL with fragment
     for cve_id in fetch_cve_list():
-        for ref in extract_refs(cve_id):
-            cve_map[_normalize(ref.url)] = cve_id
-    return cve_map
+        for url in extract_refs(cve_id):
+            norm = _normalize(url)
+            cve_map[norm] = cve_id
+            if "#" in url:
+                fragment_urls[norm] = url
+    return cve_map, fragment_urls
 
 
 def _merge(existing: dict, incoming: dict) -> dict:
     out = dict(existing)
-    for field in ("project", "label", "author", "cve_id"):
+    for field in ("project", "author", "cve_id"):
         if not out.get(field) and incoming.get(field):
             out[field] = incoming[field]
     return out
@@ -108,7 +111,7 @@ def _infer_project(url: str, kraken_projects: set[str]) -> str:
     return ""
 
 
-def _load_bugs(cve_map: dict[str, str], kraken_projects: set[str]) -> list[dict]:
+def _load_bugs(cve_map: dict[str, str], fragment_urls: dict[str, str], kraken_projects: set[str]) -> list[dict]:
     seen: dict[str, dict] = {}
 
     def _add(rec: dict) -> None:
@@ -141,6 +144,12 @@ def _load_bugs(cve_map: dict[str, str], kraken_projects: set[str]) -> list[dict]
             "author":  "",
             "cve_id":  cve_id,
         }
+
+    # Prefer the CVE's original URL when it has a fragment (e.g. #issuecomment-…)
+    for key, frag_url in fragment_urls.items():
+        if key in seen and "#" not in seen[key].get("bug_url", ""):
+            seen[key] = dict(seen[key])
+            seen[key]["bug_url"] = frag_url
 
     return list(seen.values())
 
@@ -187,9 +196,9 @@ def build_classified_bugs_csv() -> Path:
     supplement = {r["project"]: {"bugs": int(r["bugs"]), "cves": int(r["cves"])} for r in projects_rows}
 
     print("Loading CVE map from cache...")
-    cve_map = _load_cve_map()
+    cve_map, fragment_urls = _load_cve_map()
 
-    bugs = _load_bugs(cve_map, kraken_projects)
+    bugs = _load_bugs(cve_map, fragment_urls, kraken_projects)
     classified = classify(bugs, kraken_projects, supplement)
     classified.sort(key=lambda r: (r["project"], r["bug_url"]))
 
@@ -198,7 +207,6 @@ def build_classified_bugs_csv() -> Path:
                  if not r.get("author") and is_supported(r["bug_url"])]
     reporters = get_reporters(fetchable) if fetchable else {}
 
-    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     with CLASSIFIED_CSV.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()

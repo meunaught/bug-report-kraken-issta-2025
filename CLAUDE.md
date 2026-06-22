@@ -15,6 +15,7 @@ Python pipeline that locates and classifies all bug reports filed by the first a
 
 ```bash
 uv sync                        # install deps
+python main.py fetch           # download CVE JSON records into cache/
 python main.py search-author   # populate bugs_by_author.csv (slow: SF fetches ~334 tickets)
 python main.py generate        # build output/classified_bugs.csv
 ```
