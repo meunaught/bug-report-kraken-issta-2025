@@ -1,38 +1,38 @@
-project,platform
-advancecomp,GitHub Issues
-asn1c,GitHub Issues
-bento4,GitHub Issues
-cpp-peglib,GitHub Issues
-dmg2img,GitHub Issues + Red Hat Bugzilla
-faad2,GitHub Issues
-fast_ber,GitHub Issues
-faust,GitHub Issues
-ffmpeg,FFmpeg Trac
-fig2dev,SourceForge
-giflib,SourceForge
-gocr,Bugzilla + SourceForge
-gpac,GitHub Issues
-gravity,GitHub Issues
-hcxtools,GitHub Issues
-heif,GitHub Issues
-jhead,GitHub Issues
-json-c,GitHub Issues
-libelfin,GitHub Issues
-libgig,GitHub Issues
-libiff,GitHub Issues
-libjpeg,GitHub Issues
-libmaxminddb,GitHub Issues
-libnsfdb,GitHub Issues
-libraw,GitHub Issues
-libredwg,GitHub Issues
-libslax,GitHub Issues
-libxsmm,GitHub Issues
-lief,GitHub Issues
-nasm,Bugzilla
-ncurses,GNU Mailing List
-pbrt-v3,GitHub Issues
-pdftools,GitHub Issues
-retdec,GitHub Issues
-sela,GitHub Issues
-sox,SourceForge
-swftools,GitHub Issues
+project,bugs,cves
+advancecomp,3,0
+asn1c,4,0
+bento4,6,4
+cpp-peglib,2,2
+dmg2img,7,2
+faad2,6,6
+fast_ber,1,1
+faust,1,1
+ffmpeg,3,1
+fig2dev,1,1
+giflib,1,1
+gocr,4,3
+gpac,12,9
+gravity,7,5
+hcxtools,1,1
+heif,4,3
+jhead,2,0
+json-c,1,1
+libelfin,1,1
+libgig,1,1
+libiff,2,1
+libjpeg,19,7
+libmaxminddb,1,1
+libnsfdb,3,0
+libraw,3,1
+libredwg,12,9
+libslax,4,4
+libxsmm,5,2
+lief,1,1
+nasm,2,0
+ncurses,2,1
+pbrt-v3,1,1
+pdftools,6,6
+retdec,1,1
+sela,9,9
+sox,3,0
+swftools,50,32
