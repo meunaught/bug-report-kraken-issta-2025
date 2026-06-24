@@ -35,11 +35,13 @@
   report_url: https://github.com/axiomatic-systems/Bento4/issues/544
   value: https://github.com/axiomatic-systems/Bento4/issues/509
   reason: "#509 is the excluded CVE-holder report (CVE-2020-23331)"
+  note: "Related URL in CVE"
 
 - action: set_related_url
   report_url: https://github.com/axiomatic-systems/Bento4/issues/546
   value: https://github.com/axiomatic-systems/Bento4/issues/615
   reason: "#615 is the excluded CVE-holder report (CVE-2021-35306)"
+  note: "Related URL in CVE"
 
 - action: set_cve_id
   report_url: https://github.com/axiomatic-systems/Bento4/issues/544
@@ -85,6 +87,7 @@
   report_url: https://github.com/LibreDWG/libredwg/issues/253
   value: https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857
   reason: "#188 is the excluded CVE-holder report (CVE-2020-21843)"
+  note: "Related URL in CVE"
 
 - action: set_cve_id
   report_url: https://github.com/LibreDWG/libredwg/issues/253
@@ -149,6 +152,7 @@
   report_url: https://github.com/LibRaw/LibRaw/issues/318
   value: https://github.com/LibRaw/LibRaw/issues/330
   reason: "#330 is the excluded CVE-holder report (CVE-2020-24870), same crash at identify.cpp:1309:24"
+  note: "Related URL in CVE"
 
 - action: set_cve_id
   report_url: https://github.com/LibRaw/LibRaw/issues/318
@@ -169,11 +173,13 @@
   report_url: https://github.com/Lekensteyn/dmg2img/issues/9
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1959585
   reason: Downstream CVE tracking entry for CVE-2021-3548
+  note: "Related URL in CVE"
 
 - action: set_related_url
   report_url: https://github.com/Lekensteyn/dmg2img/issues/11
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1959911
   reason: Downstream CVE tracking entry for CVE-2021-32614
+  note: "Related URL in CVE"
 
 - action: set_cve_id
   report_url: https://github.com/Lekensteyn/dmg2img/issues/9
@@ -238,21 +244,25 @@
   report_url: https://sourceforge.net/p/jocr/bugs/39/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962861
   reason: Downstream CVE tracking entry for CVE-2021-33479
+  note: "Related URL in CVE"
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/40/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
   reason: Downstream CVE tracking entry for CVE-2021-33480
+  note: "Related URL in CVE"
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/41/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
   reason: Downstream CVE tracking entry for CVE-2021-33480
+  note: "Related URL in CVE"
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/42/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962865
   reason: Downstream CVE tracking entry for CVE-2021-33481
+  note: "Related URL in CVE"
 
 # ── ncurses ───────────────────────────────────────────────────────────────────
 
@@ -264,6 +274,7 @@
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html
   value: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
   reason: msg00023 is the excluded duplicate CVE reference for the same _nc_captoinfo heap-overflow (CVE-2021-39537)
+  note: "Excluded duplicate CVE reference"
 
 - action: set_label
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html

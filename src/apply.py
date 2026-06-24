@@ -23,7 +23,7 @@ AI_OVERRIDES_YAML = ROOT / "data" / "ai" / "ai-overrides.yaml"
 OVERRIDES_YAML    = ROOT / "data" / "overrides.yaml"
 OUTPUT_DIR        = ROOT / "output"
 
-FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id"]
+FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id", "notes"]
 
 ACTIONS = {"exclude", "set_label", "set_cve_id", "set_reporter", "set_related_url"}
 
@@ -49,6 +49,7 @@ def _pass1_pr_matching(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
         row = dict(row)
         if url in issue_to_pr:
             row["related_url"] = issue_to_pr[url]
+            row["notes"] = "PR by author"
             stats["issue_linked"] += 1
         kept.append(row)
 
@@ -71,6 +72,7 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
     set_cve      = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_cve_id"}
     set_reporter = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_reporter"}
     set_related  = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_related_url"}
+    set_notes    = {r["report_url"]: r["note"] for r in overrides if r["action"] == "set_related_url" and r.get("note")}
 
     stats = {a: 0 for a in ACTIONS}
     kept: list[dict] = []
@@ -85,6 +87,7 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
         if url in set_cve:      row["cve_id"]          = set_cve[url];      stats["set_cve_id"] += 1
         if url in set_reporter: row["reporter"]        = set_reporter[url]; stats["set_reporter"] += 1
         if url in set_related:  row["related_url"]     = set_related[url];  stats["set_related_url"] += 1
+        if url in set_notes:    row["notes"]           = set_notes[url]
         kept.append(row)
 
     return kept, stats
@@ -92,6 +95,8 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
 
 def apply_overrides() -> Path:
     rows = list(csv.DictReader(CLASSIFIED_CSV.open()))
+    for row in rows:
+        row.setdefault("notes", "")
 
     print("Pass 1: PR matching")
     rows, pr_stats = _pass1_pr_matching(rows)

@@ -33,7 +33,7 @@ For AI-assisted classification: after `review`, read the HTMLs in `cache/html/` 
 
 Go through triggering projects **one at a time**, present suggested actions to the user,
 wait for approval, then write confirmed entries to `data/ai/ai-overrides.yaml`.
-Do not batch-apply. Never touch `data/overrides.yaml` — that file is human-curated only.
+Do not batch-apply. Both override files are human-verified before applying.
 
 Requires `GITHUB_TOKEN` in `.env`.
 
@@ -92,8 +92,8 @@ not the pipeline — the verify failures for gpac and libredwg are expected and 
 |------|-------|
 | `data/projects.csv` | 37 KRAKEN targets with paper `bugs` and `cves` counts |
 | `data/curated.csv` | `project, bug_url, author` — entries no automated search can reach (Debian, NASM Bugzilla, ncurses ML) |
-| `data/overrides.yaml` | Machine-applied corrections: list of `{action, report_url, value?, reason}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_related_url` |
-| `data/ai/ai-overrides.yaml` | User-confirmed AI overrides; same format as `overrides.yaml`; written by Claude Code after per-project user approval |
+| `data/overrides.yaml` | Human-verified corrections: list of `{action, report_url, value?, reason, note?}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_related_url` |
+| `data/ai/ai-overrides.yaml` | Human-verified AI-assisted overrides; same format as `overrides.yaml` (including optional `note:`); drafted by Claude Code, confirmed by user before applying |
 | `data/generated/author_bugs.csv` | Output of `search-author` (issues + PRs); gitignored |
 | `data/generated/pr-matches.yaml` | Output of `match-prs`; maps each PR URL to its linked issue URL (or null); gitignored |
 | `cache/` | CVE JSON files + `authors.json` reporter cache + `html/` HTML pages; gitignored |
