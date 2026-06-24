@@ -13,8 +13,7 @@ AddressSanitizer traces (crash site *and* allocation/free sites);
 
 ## bento4 — 6 bugs, 4 CVEs (8 reports found)
 
-Two pairs are duplicates. In each case `seviezhou` re-found a CVE-bearing report filed by
-someone else; the CVE-referenced report is kept canonical.
+The CVE-referenced report is kept canonical; The other is used as related_url; .
 
 ### [#544](https://github.com/axiomatic-systems/Bento4/issues/544) ≡ [#509](https://github.com/axiomatic-systems/Bento4/issues/509) ([CVE-2020-23331](https://www.cve.org/CVERecord?id=CVE-2020-23331))
 
@@ -35,7 +34,7 @@ someone else; the CVE-referenced report is kept canonical.
 | Frame #2 | `AP4_Atom::Clone` `Ap4Atom.cpp:316` | `AP4_Atom::Clone` `Ap4Atom.cpp:316` |
 | Entry (frame #3) | `AP4_SampleDescription` ctor | `AP4_ContainerAtom::Clone` |
 
-[#546](https://github.com/axiomatic-systems/Bento4/issues/546) predates [#615](https://github.com/axiomatic-systems/Bento4/issues/615) but [#615](https://github.com/axiomatic-systems/Bento4/issues/615) is kept canonical because the CVE references it.
+
 
 ## libraw — 3 bugs, 1 CVE (4 reports found)
 
@@ -59,9 +58,8 @@ someone else; the CVE-referenced report is kept canonical.
 | | [#188](https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857) (`linhlhq`, CVE-2020-21843) | [#253](https://github.com/LibreDWG/libredwg/issues/253) (`seviezhou`) |
 |---|---|---|
 | Crash | heap-buffer-overflow READ, `bit_read_RC` | heap-buffer-overflow, `bit_read_RC` |
-| Line | `bits.c:318` (v0.10) | `bits.c:316` (commit `aee0ea`) |
+| Line | `bits.c:318` (v0.10) | `bits.c:316` |
 | Reached via | `bit_read_RC` ← `dwg_bmp` (`dwg.c:468`) | `bit_read_RC` ← `bit_read_RS` ← `bit_read_RL` ← `dwg_bmp` (`dwg.c:537`) |
 | Milestone | [0.11](https://github.com/LibreDWG/libredwg/milestone/11) | [0.11](https://github.com/LibreDWG/libredwg/milestone/11) |
 
-Two-line drift and extra intermediate frames are version skew, not a separate bug. [#188](https://github.com/LibreDWG/libredwg/issues/188)
-is kept canonical (earlier, CVE-referenced).
+[#188](https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857) is kept canonical (earlier, CVE-referenced).
