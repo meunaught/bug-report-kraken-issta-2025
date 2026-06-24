@@ -1,12 +1,67 @@
 # Override reasoning
 
-Projects are flagged when pipeline `paper_artifact` count or unique CVE count differs from
-`data/projects.csv`. Raw HTML pages for all rows in flagged projects are fetched
-(`python main.py review`), reasoned over by Claude Sonnet 4.6, and confirmed manually
-([ai-overrides](data/ai/ai-overrides.yaml), [overrides](data/overrides.yaml)).
+A project is flagged for manual review when its pipeline `paper_artifact` count or
+unique-CVE count differs from `data/projects.csv`. For each flagged project the raw HTML
+of every row is fetched (`python main.py review` → `cache/html/`), the crash reports are
+read directly, and confirmed overrides are written to
+[ai-overrides.yaml](data/ai/ai-overrides.yaml) and [overrides.yaml](data/overrides.yaml).
 
-| Project | Paper | Found | Actions | Reasoning |
-|---|---|---|---|---|
-| **bento4** | 6 bugs, 4 CVEs | 8 rows, 4 CVEs | #539 and #544 count as one bug (`related_url`). #540 and #546 count as one bug (`related_url`). Reclassify #539, #547 → `paper_artifact` | #544 and #539 both crash in `AP4_Descriptor::GetTag()` at commit `174b94`, triggered by `mp4info` vs `mp42aac`. #546 and #540 both crash in `AP4_StszAtom::WriteFields`, same commit, same pattern. After deduplication, 6 = 6 ✓ |
-| **libraw** | 3 bugs, 1 CVE | 4 rows, 1 CVE | #318 and #319 count as one bug (`related_url`). Reclassify #319, #322 → `paper_artifact` | #318 and #319 both crash in `LibRaw::identify_process_dng_fields()`, same function, same file, [fixed in the same commit](https://github.com/LibRaw/LibRaw/commit/4feaed4dea636cee4fee010f615881ccf76a096d). After deduplication: 1 CVE + #319 + #322 = 3 ✓ |
-| **libredwg** | 12 bugs, 9 CVEs | 13 rows, 8 CVEs | #256 and #257 count as one bug (`related_url`). Reclassify #253, #259, #260, #265 → `paper_artifact` | #257 and #256 (CVE-2021-39528) are the same double-free at commit `4b99ed` — ASan traces show the same heap address `0x60400000dfd0`, triggered via `dwg2dxf` vs `dwgbmp`. After deduplication: 8 CVE + 4 unknowns = 12 ✓. The 9th CVE is in the trophy list but failed to fetch from CVEProject/cvelistV5 (404). |
+
+Evidence for **bento4** and **libredwg** was verified against the full
+AddressSanitizer traces (crash site *and* allocation/free sites);
+**libraw** was further resolved by observing two issues being fixed by the same commit.
+
+## bento4 — 6 bugs, 4 CVEs (8 reports found)
+
+Two pairs are duplicates. In each case `seviezhou` re-found a CVE-bearing report filed by
+someone else; the CVE-referenced report is kept canonical.
+
+### [#544](https://github.com/axiomatic-systems/Bento4/issues/544) ≡ [#509](https://github.com/axiomatic-systems/Bento4/issues/509) ([CVE-2020-23331](https://www.cve.org/CVERecord?id=CVE-2020-23331))
+
+| | [#509](https://github.com/axiomatic-systems/Bento4/issues/509) (`r1ce-m`, CVE-2020-23331) | [#544](https://github.com/axiomatic-systems/Bento4/issues/544) (`seviezhou`) |
+|---|---|---|
+| Error | SEGV null read | SEGV null read |
+| Frame #0 | `AP4_DescriptorListWriter::Action` `Ap4Descriptor.h:108:28` | `AP4_DescriptorListWriter::Action` `Ap4Descriptor.h:108:28` |
+| Frame #1 | `AP4_List::Apply` `Ap4List.h:353:12` | `AP4_List::Apply` `Ap4List.h:353:12` |
+| Entry (frame #2) | `AP4_DecoderConfigDescriptor::WriteFields` | `AP4_EsDescriptor::WriteFields` |
+
+### [#546](https://github.com/axiomatic-systems/Bento4/issues/546) ≡ [#615](https://github.com/axiomatic-systems/Bento4/issues/615) ([CVE-2021-35306](https://www.cve.org/CVERecord?id=CVE-2021-35306))
+
+| | [#546](https://github.com/axiomatic-systems/Bento4/issues/546) (`seviezhou`, 2020-08-22) | [#615](https://github.com/axiomatic-systems/Bento4/issues/615) (`dhbbb`, 2021-06-10) |
+|---|---|---|
+| Error | SEGV null read `0x000…000` | SEGV null read `0x000…000` |
+| Frame #0 | `AP4_StszAtom::WriteFields` `Ap4StszAtom.cpp:122` | `AP4_StszAtom::WriteFields` `Ap4StszAtom.cpp:122` |
+| Frame #1 | `AP4_Atom::Write` `Ap4Atom.cpp:229` | `AP4_Atom::Write` `Ap4Atom.cpp:229` |
+| Frame #2 | `AP4_Atom::Clone` `Ap4Atom.cpp:316` | `AP4_Atom::Clone` `Ap4Atom.cpp:316` |
+| Entry (frame #3) | `AP4_SampleDescription` ctor | `AP4_ContainerAtom::Clone` |
+
+[#546](https://github.com/axiomatic-systems/Bento4/issues/546) predates [#615](https://github.com/axiomatic-systems/Bento4/issues/615) but [#615](https://github.com/axiomatic-systems/Bento4/issues/615) is kept canonical because the CVE references it.
+
+## libraw — 3 bugs, 1 CVE (4 reports found)
+
+### [#318](https://github.com/LibRaw/LibRaw/issues/318) ≡ [#319](https://github.com/LibRaw/LibRaw/issues/319)
+
+| | [#318](https://github.com/LibRaw/LibRaw/issues/318) (`seviezhou`) | [#319](https://github.com/LibRaw/LibRaw/issues/319) (`seviezhou`) |
+|---|---|---|
+| Error | stack-buffer-overflow READ 8 | stack-buffer-overflow READ 8 |
+| Function | `LibRaw::identify_process_dng_fields()` | `LibRaw::identify_process_dng_fields()` |
+| Fix | [commit 4feaed4](https://github.com/LibRaw/LibRaw/commit/4feaed4dea636cee4fee010f615881ccf76a096d) | same commit |
+
+[#319](https://github.com/LibRaw/LibRaw/issues/319) is kept; [#318](https://github.com/LibRaw/LibRaw/issues/318) is excluded with `related_url` → [#319](https://github.com/LibRaw/LibRaw/issues/319).
+
+
+## libredwg — 12 bugs, 9 CVEs (13 reports found, 8 CVEs fetchable)
+
+`seviezhou` filed [#251](https://github.com/LibreDWG/libredwg/issues/251)–[#265](https://github.com/LibreDWG/libredwg/issues/265); [#188](https://github.com/LibreDWG/libredwg/issues/188) (`linhlhq`, Jan 2020) is an orphan CVE report.
+
+### [#253](https://github.com/LibreDWG/libredwg/issues/253) ≡ [#188](https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857) ([CVE-2020-21843](https://www.cve.org/CVERecord?id=CVE-2020-21843))
+
+| | [#188](https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857) (`linhlhq`, CVE-2020-21843) | [#253](https://github.com/LibreDWG/libredwg/issues/253) (`seviezhou`) |
+|---|---|---|
+| Crash | heap-buffer-overflow READ, `bit_read_RC` | heap-buffer-overflow, `bit_read_RC` |
+| Line | `bits.c:318` (v0.10) | `bits.c:316` (commit `aee0ea`) |
+| Reached via | `bit_read_RC` ← `dwg_bmp` (`dwg.c:468`) | `bit_read_RC` ← `bit_read_RS` ← `bit_read_RL` ← `dwg_bmp` (`dwg.c:537`) |
+| Milestone | [0.11](https://github.com/LibreDWG/libredwg/milestone/11) | [0.11](https://github.com/LibreDWG/libredwg/milestone/11) |
+
+Two-line drift and extra intermediate frames are version skew, not a separate bug. [#188](https://github.com/LibreDWG/libredwg/issues/188)
+is kept canonical (earlier, CVE-referenced).
