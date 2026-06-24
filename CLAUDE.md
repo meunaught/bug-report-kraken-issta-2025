@@ -25,8 +25,9 @@ python main.py verify          # check classified_human_{commit}.csv against pro
 
 For AI-assisted classification: after `review`, read the HTMLs in `cache/html/` alongside
 `output/classified_auto.csv` and `data/projects.csv`, then write suggestions to
-`data/ai/suggestions.md`. The `review` step triggers on any project where the found bug count
-or CVE count differs from `data/projects.csv`.
+`data/ai/suggestions.md`. The `review` step triggers on any project where:
+- found bug count or unique CVE count differs from `data/projects.csv`, or
+- a CVE ID appears on more than one row (potential duplicate needing `related_url`)
 
 ### Promoting suggestions to ai-overrides
 

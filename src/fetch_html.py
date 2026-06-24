@@ -1,5 +1,7 @@
 """
-Fetch HTML pages for projects where found bug/CVE counts don't match data/projects.csv.
+Fetch HTML pages for projects that need review. Triggers when, for a project:
+  1. paper_artifact count or unique CVE count doesn't match data/projects.csv, or
+  2. a CVE ID appears on more than one row (potential duplicate needing related_url).
 
 Fetches ALL rows for those projects so the full picture is available — unknowns,
 paper_artifact peers, and Bugzilla CVE entries alike.
@@ -41,14 +43,20 @@ def fetch_for_review() -> None:
         if row["project"]:
             by_project[row["project"]].append(row)
 
-    # Trigger: found bug count or CVE count doesn't match projects.csv
+    # Trigger conditions
     projects_to_review = set()
     for proj, proj_rows in by_project.items():
         if proj not in paper:
             continue
         found_bugs = sum(1 for r in proj_rows if r["where_url_found"] == "paper_artifact")
         found_cves = len({r["cve_id"] for r in proj_rows if r.get("cve_id")})
+        # 1. Bug or CVE count doesn't match projects.csv
         if found_bugs != paper[proj]["bugs"] or found_cves != paper[proj]["cves"]:
+            projects_to_review.add(proj)
+            continue
+        # 2. Duplicate CVE IDs across rows — potential duplicate entry needing related_url
+        cve_ids = [r["cve_id"] for r in proj_rows if r.get("cve_id")]
+        if len(cve_ids) != len(set(cve_ids)):
             projects_to_review.add(proj)
 
     if not projects_to_review:
