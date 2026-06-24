@@ -7,8 +7,8 @@ read directly, and confirmed overrides are written to
 [ai-overrides.yaml](data/ai/ai-overrides.yaml) and [overrides.yaml](data/overrides.yaml).
 
 
-Evidence for **bento4** and **libredwg** was verified against the full
-AddressSanitizer traces (crash site *and* allocation/free sites);
+Evidence for **bento4** and **libredwg** was verified against the
+AddressSanitizer traces;
 **libraw** was further resolved by observing two issues being fixed by the same commit.
 
 ## bento4 — 6 bugs, 4 CVEs (8 reports found)
