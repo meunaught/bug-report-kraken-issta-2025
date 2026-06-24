@@ -2,7 +2,7 @@
 
 Projects are flagged when pipeline `paper_artifact` count or unique CVE count differs from
 `data/projects.csv`. Raw HTML pages for all rows in flagged projects are fetched
-(`python main.py review`), reasoned over by Claude Code, and confirmed manually
+(`python main.py review`), reasoned over by Claude Sonnet 4.6, and confirmed manually
 ([ai-overrides](data/ai/ai-overrides.yaml), [overrides](data/overrides.yaml)).
 
 | Project | Paper | Found | Actions | Reasoning |
