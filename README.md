@@ -65,11 +65,29 @@ Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, li
 
 ---
 
+## Review & override workflow
+
+When `paper_artifact` count or unique CVE count for a project differs from `data/projects.csv`,
+the project is flagged for review. Raw HTML for all its rows is fetched into `cache/html/`
+(`python main.py review`). Claude Code then reads those pages and writes
+`data/ai/suggestions.md` — one section per flagged project with proposed actions and reasoning
+grounded in the HTML evidence.
+
+Each suggestion is presented to the user one project at a time for confirmation. Approved
+entries are written to `data/ai/ai-overrides.yaml`. Human-curated corrections (including those
+promoted from AI suggestions) live in `data/overrides.yaml`, which is the sole input to
+`python main.py apply`.
+
+| File | Role |
+|---|---|
+| `data/ai/suggestions.md` | AI-proposed actions, grounded in `cache/html/`; not applied directly |
+| `data/ai/ai-overrides.yaml` | User-confirmed subset of suggestions |
+| `data/overrides.yaml` | Human-curated corrections applied by `python main.py apply` |
+
 ## Override reasoning
 
 Projects are flagged when pipeline `paper_artifact` count or unique CVE count differs from
-`data/projects.csv`. Raw HTML pages for all rows in flagged projects are fetched
-(`python main.py review`), reasoned over by Claude Code, and verified manually.
+`data/projects.csv`. The table below shows how each flagged project was resolved.
 
 | Project | Paper | Found | Actions | Reasoning |
 |---|---|---|---|---|
