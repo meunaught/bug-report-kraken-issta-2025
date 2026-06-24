@@ -39,6 +39,12 @@ def cmd_generate(args: list[str]) -> None:
     build_classified_bugs_csv()
 
 
+def cmd_match_prs(args: list[str]) -> None:
+    from pr_match import match_prs
+    print("Matching PRs to issues via HTML extraction...")
+    match_prs()
+
+
 def cmd_review(args: list[str]) -> None:
     from fetch_html import fetch_for_review
     fetch_for_review()
@@ -67,8 +73,9 @@ COMMANDS = {
     "fetch":         (cmd_fetch,         "Download CVE JSON records into cache/"),
     "generate":      (cmd_generate,      "Build output/classified_auto.csv"),
     "search-author": (cmd_search_author, "Search bugs by author across GitHub, Trac, SF, Bugzilla"),
+    "match-prs":     (cmd_match_prs,     "Fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml"),
     "review":        (cmd_review,        "Fetch HTML for projects with bug/CVE count mismatch → cache/html/"),
-    "apply":         (cmd_apply,         "Apply data/overrides.yaml → output/classified_human_{commit}.csv"),
+    "apply":         (cmd_apply,         "Apply pr-matches + overrides → output/classified_human_{commit}.csv"),
     "verify":        (cmd_verify,        "Verify classified_human_{commit}.csv against projects.csv rules"),
 }
 

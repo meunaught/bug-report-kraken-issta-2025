@@ -18,8 +18,9 @@ uv sync                        # install deps
 python main.py fetch           # download CVE JSON records into cache/
 python main.py search-author   # populate data/generated/author_bugs.csv (slow: SF fetches ~334 tickets)
 python main.py generate        # build output/classified_auto.csv
+python main.py match-prs       # fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml
 python main.py review          # fetch HTML for projects with count mismatch → cache/html/
-python main.py apply           # apply data/overrides.yaml → output/classified_human_{commit}.csv
+python main.py apply           # apply pr-matches + overrides → output/classified_human_{commit}.csv
 python main.py verify          # check classified_human_{commit}.csv against projects.csv rules
 ```
 
@@ -42,7 +43,8 @@ Requires `GITHUB_TOKEN` in `.env`.
 CVE JSON cache        ──┐
 data/generated/       ──┼── src/classify.py ──→ output/classified_auto.csv
 data/curated.csv      ──┘
-                                    ↓ src/apply.py (data/overrides.yaml)
+                              ↓ src/apply.py — pass 1: PR matching (data/generated/pr-matches.yaml)
+                                              — pass 2: labelling  (data/overrides.yaml, data/ai/ai-overrides.yaml)
                          output/classified_human_{commit}.csv
 ```
 
@@ -77,10 +79,11 @@ not the pipeline — the verify failures for gpac and libredwg are expected and 
 | `src/cve_fetch.py` | Download CVE JSON records to `cache/` |
 | `src/cve_refs.py` | Parse bug URLs out of CVE JSON `references` field |
 | `src/classify.py` | Main pipeline: joins all sources → `classified_auto.csv` |
-| `src/search.py` | Author-based search: GitHub API, FFmpeg Trac, SourceForge, Bugzilla |
+| `src/search.py` | Author-based search: GitHub API (issues + PRs), FFmpeg Trac, SourceForge, Bugzilla |
+| `src/pr_match.py` | Fetch PR HTML, extract linked issue URLs → `data/generated/pr-matches.yaml` |
 | `src/reporter.py` | Fetch reporter username for GitHub/SF URLs; cache in `cache/authors.json` |
 | `src/fetch_html.py` | Fetch HTML for projects with bug/CVE count mismatch → `cache/html/` for AI reasoning |
-| `src/apply.py` | Apply `data/overrides.yaml` → `classified_human_{commit}.csv` |
+| `src/apply.py` | Two-pass apply: (1) PR matching via `pr-matches.yaml`, (2) labelling via override YAMLs |
 | `src/verify.py` | Verify `classified_human_{commit}.csv` against `data/projects.csv` rules; exits 1 if AI review needed |
 
 ## Data files
@@ -91,5 +94,6 @@ not the pipeline — the verify failures for gpac and libredwg are expected and 
 | `data/curated.csv` | `project, bug_url, author` — entries no automated search can reach (Debian, NASM Bugzilla, ncurses ML) |
 | `data/overrides.yaml` | Machine-applied corrections: list of `{action, report_url, value?, reason}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_related_url` |
 | `data/ai/ai-overrides.yaml` | User-confirmed AI overrides; same format as `overrides.yaml`; written by Claude Code after per-project user approval |
-| `data/generated/author_bugs.csv` | Output of `search-author`; gitignored |
+| `data/generated/author_bugs.csv` | Output of `search-author` (issues + PRs); gitignored |
+| `data/generated/pr-matches.yaml` | Output of `match-prs`; maps each PR URL to its linked issue URL (or null); gitignored |
 | `cache/` | CVE JSON files + `authors.json` reporter cache + `html/` HTML pages; gitignored |

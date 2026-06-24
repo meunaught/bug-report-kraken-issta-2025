@@ -59,7 +59,7 @@ def search_github() -> list[BugResult]:
     while True:
         r = github_get(
             "https://api.github.com/search/issues",
-            params={"q": f"author:{GITHUB_USERNAME} type:issue",
+            params={"q": f"author:{GITHUB_USERNAME}",
                     "per_page": 100, "page": page},
         )
         if r.status_code == 422:
@@ -205,7 +205,7 @@ def search_bugzilla() -> list[BugResult]:
 def search_all() -> list[BugResult]:
     all_results: list[BugResult] = []
 
-    print("  GitHub Issues:")
+    print("  GitHub Issues + PRs:")
     gh = search_github()
     print(f"    {len(gh)} found")
     all_results.extend(gh)

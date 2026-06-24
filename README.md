@@ -49,10 +49,10 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 
 | | Count |
 |---|---|
-| Total bug reports found by pipeline | 258 |
-| Classified by pipeline alone | 238 |
+| Total bug reports found by pipeline | 295 |
+| Classified by pipeline alone | 275 |
 | Flagged `unknown` — needed manual inspection | 20 |
-| **Final rows after overrides** | **248** |
+| **Final rows after overrides** | **272** |
 
 Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, libredwg, ncurses):
 
@@ -62,6 +62,8 @@ Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, li
 | Reclassified `unknown` → `paper_artifact` | 16 |
 | CVE IDs assigned to upstream reports | 2 |
 | Reporters set (deleted/archived issues) | 6 |
+
+PR rows are handled separately: 13 matched PRs are collapsed into their linked issue's `related_url` and excluded from the row count; 24 unmatched PRs (no linked issue found) retain their own rows.
 
 ---
 
