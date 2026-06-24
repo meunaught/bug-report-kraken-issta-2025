@@ -34,16 +34,16 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 
 8 reports found by the pipeline. Two pairs are duplicates: #544 (seviezhou) ≡ #509, and #546 (seviezhou) ≡ #615. The author's reports are canonical; CVE-holder reports are excluded and moved to `related_url`.
 
-| Issue | CVE | Classifier | Human review |
+| Issue | Auto CVE | Classifier | Human review |
 |---|---|---|---|
 | #540 | CVE-2020-23912 | `paper_artifact` | — |
 | #545 | CVE-2021-32265 | `paper_artifact` | — |
-| #544 | CVE-2020-23331 | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; CVE transferred from excluded #509 |
-| #546 | CVE-2021-35306 | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; CVE transferred from excluded #615 |
+| #509 | CVE-2020-23331 | `paper_artifact` | excluded — duplicate of #544 (seviezhou); CVE-2020-23331 transferred to #544; becomes `related_url` |
+| #615 | CVE-2021-35306 | `paper_artifact` | excluded — duplicate of #546 (seviezhou); CVE-2021-35306 transferred to #546; becomes `related_url` |
+| #544 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; receives CVE-2020-23331 from #509 |
+| #546 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; receives CVE-2021-35306 from #615 |
 | #539 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct crash site |
 | #547 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct crash site |
-| #509 | CVE-2020-23331 | `paper_artifact` | excluded — duplicate of #544 (seviezhou); becomes `related_url` of #544 |
-| #615 | CVE-2021-35306 | `paper_artifact` | excluded — duplicate of #546 (seviezhou); becomes `related_url` of #546 |
 
 ---
 
