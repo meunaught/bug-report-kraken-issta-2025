@@ -10,6 +10,7 @@ Python pipeline that locates and classifies all bug reports filed by the first a
 - **KRAKEN targets**: 37 projects listed in `data/projects.csv` (also contains paper bug/CVE counts)
 - **Output**: `output/classified_auto.csv` (programmatic) → `output/classified_human_{commit}.csv` (after overrides)
 - **`where_url_found` values**: `paper_artifact` | `activity_history` | `unknown`
+- **`notes` values** (populated when `related_url` is set): `"Related URL in CVE"` | `"Archived copy (original deleted)"` | `"Excluded duplicate CVE reference"` | `"PR by author"`
 
 ## Running the pipeline
 
