@@ -32,16 +32,18 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 
 ### Example — bento4 (paper: 6 bugs, 4 CVEs)
 
+8 reports found by the pipeline. Two pairs are duplicates: #544 (seviezhou) ≡ #509, and #546 (seviezhou) ≡ #615. The author's reports are canonical; CVE-holder reports are excluded and moved to `related_url`.
+
 | Issue | CVE | Classifier | Human review |
 |---|---|---|---|
-| #509 | CVE-2020-23331 | `paper_artifact` | — |
 | #540 | CVE-2020-23912 | `paper_artifact` | — |
 | #545 | CVE-2021-32265 | `paper_artifact` | — |
-| #615 | CVE-2021-35306 | `paper_artifact` | — |
-| #539 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct bug; count resolves after deduplication |
-| #547 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct bug; count resolves after deduplication |
-| #544 | — | `unknown` (8 found ≠ 6) | excluded — duplicate of #539, same crash different tool (`mp4info` vs `mp42aac`) |
-| #546 | — | `unknown` (8 found ≠ 6) | excluded — duplicate of #540, same crash different tool |
+| #544 | CVE-2020-23331 | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; CVE transferred from excluded #509 |
+| #546 | CVE-2021-35306 | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; CVE transferred from excluded #615 |
+| #539 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct crash site |
+| #547 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct crash site |
+| #509 | CVE-2020-23331 | `paper_artifact` | excluded — duplicate of #544 (seviezhou); becomes `related_url` of #544 |
+| #615 | CVE-2021-35306 | `paper_artifact` | excluded — duplicate of #546 (seviezhou); becomes `related_url` of #546 |
 
 ---
 
@@ -52,7 +54,7 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 | Total bug reports found by pipeline | 295 |
 | Classified by pipeline alone | 275 |
 | Flagged `unknown` — needed manual inspection | 20 |
-| **Final rows after overrides** | **272** |
+| **Final rows after overrides** | **271** |
 
 Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, libredwg, ncurses):
 
