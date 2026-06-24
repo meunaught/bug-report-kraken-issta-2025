@@ -3,10 +3,10 @@ from pathlib import Path
 
 import httpx
 
-from github_client import github_client, github_get
+from client import github_client, github_get
 
 CVELISTV5_RAW = "https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves"
-CACHE_DIR = Path(__file__).parent.parent / "cache"
+CACHE_DIR = Path(__file__).parent.parent / "cache" / "json"
 
 
 def cve_json_url(cve_id: str) -> str:
@@ -66,7 +66,7 @@ def fetch_all(cve_ids: list[str], *, refresh: bool = False) -> dict[str, str]:
 
 if __name__ == "__main__":
     import sys
-    from fetch_cve_list import fetch_cve_list
+    from cve_list import fetch_cve_list
 
     refresh = "--refresh" in sys.argv
     print("Fetching CVE list from KRAKEN README...")

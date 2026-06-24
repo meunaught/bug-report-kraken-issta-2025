@@ -6,7 +6,7 @@ from pathlib import Path
 
 import httpx
 
-from github_client import github_get
+from client import github_get
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "generated"
 
@@ -111,7 +111,7 @@ def _sf_all_ticket_nums(sf_project: str, sf_tracker: str) -> list[int]:
 
 
 def search_sourceforge() -> list[BugResult]:
-    from reporter_fetcher import get_reporters
+    from reporter import get_reporters
 
     results: list[BugResult] = []
 
@@ -231,7 +231,7 @@ def search_all() -> list[BugResult]:
 def write_csv(results: list[BugResult]) -> Path:
     from dataclasses import asdict
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    out = DATA_DIR / "bugs_by_author.csv"
+    out = DATA_DIR / "author_bugs.csv"
     with out.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["project", "bug_url", "author"])
         writer.writeheader()

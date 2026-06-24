@@ -1,0 +1,194 @@
+- action: exclude
+  report_url: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
+  reason: Duplicate CVE reference for ncurses; the 2020-08 ML post is the canonical entry
+- action: exclude
+  report_url: https://github.com/LibRaw/LibRaw/issues/318
+  reason: 'Consolidated into issue #319 via related_url'
+- action: exclude
+  report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1959585
+  reason: Downstream duplicate of dmg2img/issues/9 (CVE-2021-3548)
+- action: exclude
+  report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1959911
+  reason: Downstream duplicate of dmg2img/issues/11 (CVE-2021-32614)
+- action: exclude
+  report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
+  reason: Downstream duplicate of jocr/bugs/40 and /41 (CVE-2021-33480)
+- action: exclude
+  report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962861
+  reason: Downstream duplicate of jocr/bugs/39 (CVE-2021-33479)
+- action: exclude
+  report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962865
+  reason: Downstream duplicate of jocr/bugs/42 (CVE-2021-33481)
+- action: exclude
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/544
+  reason: 'Duplicate of #539 — same null AP4_Descriptor deref, commit 174b94; #539 mp42aac / #544 mp4info
+    (Ap4Descriptor.h:108)'
+- action: exclude
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/546
+  reason: 'Duplicate of #540 (CVE-2020-23912) — same AP4_StszAtom::WriteFields null deref, commit 174b94;
+    #540 mp42aac line 154 / #546 mp4info line 122'
+- action: exclude
+  report_url: https://github.com/LibreDWG/libredwg/issues/257
+  reason: 'Duplicate of #256 (CVE-2021-39528) — same double-free, commit 4b99ed, same heap address 0x60400000dfd0;
+    #256 dwgbmp / #257 dwg2dxf via free.c:1314'
+- action: set_label
+  report_url: https://github.com/LibRaw/LibRaw/issues/319
+  value: paper_artifact
+  reason: 'Issues #318 and #319 count as one bug; both are paper bugs'
+- action: set_label
+  report_url: https://github.com/LibRaw/LibRaw/issues/322
+  value: paper_artifact
+  reason: Count-based pass leaves this unresolved; confirmed paper bug
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/8
+  value: paper_artifact
+  reason: All 7 dmg2img bugs are paper bugs; After excluding bugzilla duplicates, 7/7 matches
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/9
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/10
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/11
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/12
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/13
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/14
+  value: paper_artifact
+  reason: Same as above
+- action: set_label
+  report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html
+  value: paper_artifact
+  reason: after excluding duplicate msg00023; 2/2 ncurses bugs are paper bugs
+- action: set_label
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/539
+  value: paper_artifact
+  reason: 'After excluding duplicate #544, total matches paper'
+- action: set_label
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/547
+  value: paper_artifact
+  reason: Distinct bug — assertion at Ap4Atom.cpp:763
+- action: set_label
+  report_url: https://github.com/LibreDWG/libredwg/issues/253
+  value: paper_artifact
+  reason: 'After excluding #257, total matches paper; distinct — heap-buffer-overflow in bit_read_RC at
+    bits.c:316, commit aee0ea'
+- action: set_label
+  report_url: https://github.com/LibreDWG/libredwg/issues/259
+  value: paper_artifact
+  reason: Distinct — malloc-size-error in decode.c:3437, commit 39ef943
+- action: set_label
+  report_url: https://github.com/LibreDWG/libredwg/issues/260
+  value: paper_artifact
+  reason: Distinct — assertion fail at decode.c:3574, commit 39ef943
+- action: set_label
+  report_url: https://github.com/LibreDWG/libredwg/issues/265
+  value: paper_artifact
+  reason: Distinct — unknown-crash in decode.c:2264, commit 66a348
+- action: set_cve_id
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/9
+  value: CVE-2021-3548
+  reason: CVE only references downstream redhat entry (id=1959585); this is the upstream report
+- action: set_cve_id
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/11
+  value: CVE-2021-32614
+  reason: CVE only references downstream redhat entry (id=1959911); this is the upstream report
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/1
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/2
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/3
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/4
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/5
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_reporter
+  report_url: https://github.com/leonhad/pdftools/issues/6
+  value: seviezhou
+  reason: Verified by manual inspection of Wayback snapshot
+- action: set_related_url
+  report_url: https://github.com/LibRaw/LibRaw/issues/319
+  value: https://github.com/LibRaw/LibRaw/issues/318
+  reason: '#318 is the excluded companion issue'
+- action: set_related_url
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/539
+  value: https://github.com/axiomatic-systems/Bento4/issues/544
+  reason: '#544 is the excluded duplicate (mp4info)'
+- action: set_related_url
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/540
+  value: https://github.com/axiomatic-systems/Bento4/issues/546
+  reason: '#546 is the excluded duplicate (mp4info)'
+- action: set_related_url
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/9
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1959585
+  reason: Downstream CVE tracking entry for CVE-2021-3548
+- action: set_related_url
+  report_url: https://github.com/Lekensteyn/dmg2img/issues/11
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1959911
+  reason: Downstream CVE tracking entry for CVE-2021-32614
+- action: set_related_url
+  report_url: https://sourceforge.net/p/jocr/bugs/39/
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1962861
+  reason: Downstream CVE tracking entry for CVE-2021-33479
+- action: set_related_url
+  report_url: https://sourceforge.net/p/jocr/bugs/40/
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
+  reason: Downstream CVE tracking entry for CVE-2021-33480
+- action: set_related_url
+  report_url: https://sourceforge.net/p/jocr/bugs/41/
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
+  reason: Downstream CVE tracking entry for CVE-2021-33480
+- action: set_related_url
+  report_url: https://sourceforge.net/p/jocr/bugs/42/
+  value: https://bugzilla.redhat.com/show_bug.cgi?id=1962865
+  reason: Downstream CVE tracking entry for CVE-2021-33481
+- action: set_related_url
+  report_url: https://github.com/LibreDWG/libredwg/issues/256
+  value: https://github.com/LibreDWG/libredwg/issues/257
+  reason: '#257 is the excluded duplicate (dwg2dxf)'
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/1
+  value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/1
+  reason: Original issue deleted; Wayback snapshot is the live copy
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/2
+  value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/2
+  reason: Original issue deleted; Wayback snapshot is the live copy
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/3
+  value: https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/3
+  reason: Original issue deleted; Wayback snapshot is the live copy
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/4
+  value: https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/4
+  reason: Original issue deleted; Wayback snapshot is the live copy
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/5
+  value: https://web.archive.org/web/20201018023241/https://github.com/leonhad/pdftools/issues/5
+  reason: Original issue deleted; Wayback snapshot is the live copy
+- action: set_related_url
+  report_url: https://github.com/leonhad/pdftools/issues/6
+  value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/6
+  reason: Original issue deleted; Wayback snapshot is the live copy

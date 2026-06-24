@@ -1,6 +1,6 @@
 import re
 
-from github_client import github_get
+from client import github_get
 
 README_URL = "https://raw.githubusercontent.com/seviezhou/Kraken/main/README.md"
 

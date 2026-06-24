@@ -2,7 +2,7 @@ import json
 import re
 from pathlib import Path
 
-CACHE_DIR = Path(__file__).parent.parent / "cache"
+CACHE_DIR = Path(__file__).parent.parent / "cache" / "json"
 
 # URL patterns that identify bug tracker links.
 _TRACKER_PATTERNS: list[re.Pattern] = [
@@ -53,7 +53,7 @@ def extract_refs(cve_id: str) -> list[str]:
 
 
 if __name__ == "__main__":
-    from fetch_cve_list import fetch_cve_list
+    from cve_list import fetch_cve_list
 
     cve_ids = fetch_cve_list()
     no_refs = []

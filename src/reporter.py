@@ -7,7 +7,7 @@ Supported:
 
 Unsupported platforms (Bugzilla, Debian, mailing lists, Wayback) return "".
 
-Cache: cache/authors.json — {url: login}. API is only called for URLs not yet
+Cache: cache/json/authors.json — {url: login}. API is only called for URLs not yet
 in cache.
 """
 
@@ -17,7 +17,7 @@ from pathlib import Path
 
 import httpx
 
-CACHE_PATH = Path(__file__).parent.parent / "cache" / "authors.json"
+CACHE_PATH = Path(__file__).parent.parent / "cache" / "json" / "authors.json"
 
 # ── Platform detection ────────────────────────────────────────────────────────
 
@@ -38,7 +38,7 @@ def is_supported(url: str) -> bool:
 # ── Fetchers ──────────────────────────────────────────────────────────────────
 
 def _fetch_github(url: str) -> str:
-    from github_client import github_get
+    from client import github_get
 
     comment_m = _GH_COMMENT_RE.search(url)
     issue_m   = _GH_ISSUE_RE.search(url)

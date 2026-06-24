@@ -1,4 +1,5 @@
 import os
+import subprocess
 from pathlib import Path
 
 import httpx
@@ -36,3 +37,12 @@ def github_get(url: str, **kwargs) -> httpx.Response:
 def github_client(**kwargs) -> httpx.Client:
     return httpx.Client(headers=github_headers(), follow_redirects=True,
                         timeout=30, **kwargs)
+
+
+def git_short_commit() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], text=True
+        ).strip()
+    except Exception:
+        return "unknown"

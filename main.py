@@ -2,9 +2,9 @@ import sys
 
 sys.path.insert(0, "src")
 
-from fetch_cve_list import fetch_cve_list
-from fetch_cves import fetch_all
-from search_by_author import search_all, write_csv as write_author_csv
+from cve_list import fetch_cve_list
+from cve_fetch import fetch_all
+from search import search_all, write_csv as write_author_csv
 
 
 def _fetch_cve_ids() -> list[str]:
@@ -35,12 +35,27 @@ def cmd_fetch(args: list[str]) -> None:
 
 
 def cmd_generate(args: list[str]) -> None:
-    from build_classified_bugs_csv import build_classified_bugs_csv
+    from classify import build_classified_bugs_csv
     build_classified_bugs_csv()
 
 
+def cmd_review(args: list[str]) -> None:
+    from fetch_html import fetch_for_review
+    fetch_for_review()
+
+
+def cmd_apply(args: list[str]) -> None:
+    from apply import apply_overrides
+    apply_overrides()
+
+
+def cmd_verify(args: list[str]) -> None:
+    from verify import verify
+    sys.exit(0 if verify() else 1)
+
+
 def cmd_search_author(args: list[str]) -> None:
-    from search_by_author import AUTHOR_NAME, GITHUB_USERNAME, SF_USERNAME
+    from search import AUTHOR_NAME, GITHUB_USERNAME, SF_USERNAME
     print(f"Searching bugs by {AUTHOR_NAME} "
           f"(GitHub: {GITHUB_USERNAME}, SF: {SF_USERNAME})")
     results = search_all()
@@ -50,8 +65,11 @@ def cmd_search_author(args: list[str]) -> None:
 
 COMMANDS = {
     "fetch":         (cmd_fetch,         "Download CVE JSON records into cache/"),
-    "generate":      (cmd_generate,      "Build output/classified_bugs.csv"),
+    "generate":      (cmd_generate,      "Build output/classified_auto.csv"),
     "search-author": (cmd_search_author, "Search bugs by author across GitHub, Trac, SF, Bugzilla"),
+    "review":        (cmd_review,        "Fetch HTML for projects with bug/CVE count mismatch → cache/html/"),
+    "apply":         (cmd_apply,         "Apply data/overrides.yaml → output/classified_human_{commit}.csv"),
+    "verify":        (cmd_verify,        "Verify classified_human_{commit}.csv against projects.csv rules"),
 }
 
 

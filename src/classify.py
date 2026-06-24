@@ -1,9 +1,9 @@
 """
-Build data/generated/classified_bugs_mahadi.csv.
+Build output/classified_auto.csv.
 
 Sources (in merge order, later wins on conflict):
-  1. data/generated/bugs_by_author.csv  — all author-searched bugs (KRAKEN + non-KRAKEN)
-  2. data/hand_curated.csv              — manually verified entries no search can reach
+  1. data/generated/author_bugs.csv  — all author-searched bugs (KRAKEN + non-KRAKEN)
+  2. data/curated.csv                — manually verified entries no search can reach
 
 Classification (where_url_found):
   paper_artifact   — certain this bug was found by the KRAKEN paper
@@ -26,12 +26,12 @@ from pathlib import Path
 
 DATA_DIR       = Path(__file__).parent.parent / "data"
 OUTPUT_DIR     = Path(__file__).parent.parent / "output"
-AUTHOR_CSV     = DATA_DIR / "generated" / "bugs_by_author.csv"
-HAND_CURATED   = DATA_DIR / "hand_curated.csv"
-CLASSIFIED_CSV = OUTPUT_DIR / "classified_bugs.csv"
+AUTHOR_CSV     = DATA_DIR / "generated" / "author_bugs.csv"
+HAND_CURATED   = DATA_DIR / "curated.csv"
+CLASSIFIED_CSV = OUTPUT_DIR / "classified_auto.csv"
 PROJECTS_CSV   = DATA_DIR / "projects.csv"
 
-FIELDS = ["report_url", "where_url_found", "reporter", "cve_id", "related_url"]
+FIELDS = ["project", "report_url", "where_url_found", "reporter", "cve_id", "related_url"]
 
 # ── URL canonicalisation ───────────────────────────────────────────────────────
 
@@ -60,8 +60,8 @@ def _normalize(url: str) -> str:
 # ── Pipeline ──────────────────────────────────────────────────────────────────
 
 def _load_cve_map() -> tuple[dict[str, str], dict[str, str]]:
-    from extract_refs import extract_refs
-    from fetch_cve_list import fetch_cve_list
+    from cve_refs import extract_refs
+    from cve_list import fetch_cve_list
     cve_map: dict[str, str] = {}
     fragment_urls: dict[str, str] = {}  # norm_key → original URL with fragment
     for cve_id in fetch_cve_list():
@@ -189,7 +189,7 @@ def classify(bugs: list[dict], kraken_projects: set[str], supplement: dict) -> l
 
 
 def build_classified_bugs_csv() -> Path:
-    from reporter_fetcher import get_reporters, is_supported
+    from reporter import get_reporters, is_supported
 
     projects_rows = list(csv.DictReader(PROJECTS_CSV.open()))
     kraken_projects = {r["project"] for r in projects_rows}
@@ -213,6 +213,7 @@ def build_classified_bugs_csv() -> Path:
         for rec in classified:
             reporter = rec.get("author") or reporters.get(rec["bug_url"], "")
             writer.writerow({
+                "project":         rec.get("project", ""),
                 "report_url":      rec["bug_url"],
                 "where_url_found": rec["where_url_found"],
                 "reporter":        reporter,
