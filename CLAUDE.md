@@ -63,8 +63,8 @@ Orphan CVE bugs (in CVE references but not found by author search) are added aut
 
 | Project | Expected CVEs | Found CVEs | Notes |
 |---|---|---|---|
-| gpac | 9 | 8 | 9th CVE absent from KRAKEN README trophy list |
-| libredwg | 9 | 8 | 9th CVE absent from KRAKEN README trophy list |
+| gpac | 9 | 8 | 9th CVE in trophy list but failed to fetch from CVEProject/cvelistV5 (404) |
+| libredwg | 9 | 8 | 9th CVE in trophy list but failed to fetch from CVEProject/cvelistV5 (404) |
 
 117 of 119 CVEs from the trophy list are fetchable; 2 are missing from the CVEProject/cvelistV5
 source and leave `.missing` sentinel files in `cache/json/`. These gaps are in the upstream data,

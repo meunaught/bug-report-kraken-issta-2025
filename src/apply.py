@@ -16,7 +16,7 @@ CLASSIFIED_CSV = ROOT / "output" / "classified_auto.csv"
 OVERRIDES_YAML = ROOT / "data" / "overrides.yaml"
 OUTPUT_DIR     = ROOT / "output"
 
-FIELDS = ["project", "report_url", "where_url_found", "reporter", "cve_id", "related_url"]
+FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id"]
 
 ACTIONS = {"exclude", "set_label", "set_cve_id", "set_reporter", "set_related_url"}
 

@@ -31,7 +31,7 @@ HAND_CURATED   = DATA_DIR / "curated.csv"
 CLASSIFIED_CSV = OUTPUT_DIR / "classified_auto.csv"
 PROJECTS_CSV   = DATA_DIR / "projects.csv"
 
-FIELDS = ["project", "report_url", "where_url_found", "reporter", "cve_id", "related_url"]
+FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id"]
 
 # ── URL canonicalisation ───────────────────────────────────────────────────────
 
