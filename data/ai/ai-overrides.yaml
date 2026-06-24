@@ -1,91 +1,95 @@
 # AI-confirmed overrides
 # Same format as data/overrides.yaml; applied first by src/apply.py (pass 2).
 # Entries are confirmed by the user one project at a time, then written here directly.
-# Each entry carries a `model:` tag recording which model produced it
-# (ignored by apply.py — it only reads action/report_url/value).
-#
-# Provenance:
-#   claude-sonnet-4-6 (2026-06-24): dmg2img, gocr, libraw, ncurses
-#   claude-opus-4-8   (2026-06-24): bento4, libredwg
-
-
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  claude-opus-4-8                                                              ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
 
 # ── bento4 ────────────────────────────────────────────────────────────────────
-# 8 reports found; paper = 6 bugs / 4 CVEs. Two are duplicates of CVE-bearing
-# reports filed by other people; #509 and #615 are kept as canonical (CVE-referenced).
+# 8 reports found; paper = 6 bugs / 4 CVEs. Two pairs are duplicates; author's
+# reports (#544, #546) are canonical; CVE-holder reports (#509, #615) are excluded.
 
 - action: exclude
-  report_url: https://github.com/axiomatic-systems/Bento4/issues/544
-  reason: >-
-    Duplicate of #509 (CVE-2020-23331) — identical null-pointer READ SEGV at
-    AP4_DescriptorListWriter::Action (Ap4Descriptor.h:108:28) ← AP4_List::Apply
-    (Ap4List.h:353:12). Differs only in the calling container's WriteFields
-    (#509 AP4_DecoderConfigDescriptor / #544 AP4_EsDescriptor).
-  model: claude-opus-4-8
-
-- action: exclude
-  report_url: https://github.com/axiomatic-systems/Bento4/issues/546
-  reason: >-
-    Duplicate of #615 (CVE-2021-35306) — identical null-pointer READ SEGV at
-    AP4_StszAtom::WriteFields (Ap4StszAtom.cpp:122) ← AP4_Atom::Write
-    (Ap4Atom.cpp:229) ← AP4_Atom::Clone (Ap4Atom.cpp:316); the CVE text names
-    AP4_StszAtom::WriteFields. Differs only in entry path (#546 via
-    AP4_SampleDescription ctor / #615 via AP4_ContainerAtom::Clone).
-  model: claude-opus-4-8
-
-- action: set_related_url
   report_url: https://github.com/axiomatic-systems/Bento4/issues/509
-  value: https://github.com/axiomatic-systems/Bento4/issues/544
-  reason: "#544 is the excluded duplicate (EsDescriptor write path)"
-  model: claude-opus-4-8
+  reason: >-
+    Duplicate of #544 (seviezhou) — same null-pointer READ SEGV at
+    AP4_DescriptorListWriter::Action (Ap4Descriptor.h:108:28) ← AP4_List::Apply
+    (Ap4List.h:353:12). #544 is canonical as the author's report.
+
+- action: exclude
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/615
+  reason: >-
+    Duplicate of #546 (seviezhou) — same null-pointer READ SEGV at
+    AP4_StszAtom::WriteFields (Ap4StszAtom.cpp:122) ← AP4_Atom::Write
+    (Ap4Atom.cpp:229) ← AP4_Atom::Clone (Ap4Atom.cpp:316).
+    #546 is canonical as the author's report.
+
+- action: set_label
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/544
+  value: paper_artifact
+  reason: Author's report; canonical for CVE-2020-23331 pair
+
+- action: set_label
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/546
+  value: paper_artifact
+  reason: Author's report; canonical for CVE-2021-35306 pair
 
 - action: set_related_url
-  report_url: https://github.com/axiomatic-systems/Bento4/issues/615
-  value: https://github.com/axiomatic-systems/Bento4/issues/546
-  reason: >-
-    #546 is the excluded duplicate; it is seviezhou's own earlier report
-    (2020-08-22) of the same crash later filed as #615 (2021-06-10).
-  model: claude-opus-4-8
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/544
+  value: https://github.com/axiomatic-systems/Bento4/issues/509
+  reason: "#509 is the excluded CVE-holder report (CVE-2020-23331)"
+
+- action: set_related_url
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/546
+  value: https://github.com/axiomatic-systems/Bento4/issues/615
+  reason: "#615 is the excluded CVE-holder report (CVE-2021-35306)"
+
+- action: set_cve_id
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/544
+  value: CVE-2020-23331
+  reason: CVE transferred from excluded #509
+
+- action: set_cve_id
+  report_url: https://github.com/axiomatic-systems/Bento4/issues/546
+  value: CVE-2021-35306
+  reason: CVE transferred from excluded #615
 
 - action: set_label
   report_url: https://github.com/axiomatic-systems/Bento4/issues/539
   value: paper_artifact
   reason: >-
     Distinct read-path crash — AP4_Descriptor::GetTag (Ap4Descriptor.h:61) via
-    AP4_DescriptorFinder::Test; not a duplicate of #544. After excluding #544 the
-    total matches the paper.
-  model: claude-opus-4-8
+    AP4_DescriptorFinder::Test; not a duplicate of #544.
 
 - action: set_label
   report_url: https://github.com/axiomatic-systems/Bento4/issues/547
   value: paper_artifact
   reason: Distinct — assertion at Ap4Atom.cpp:763
-  model: claude-opus-4-8
 
 # ── libredwg ──────────────────────────────────────────────────────────────────
 # 13 reports found (12 by seviezhou + #188 by linhlhq); paper = 12 bugs / 9 CVEs.
-# #253 ≡ #188 (CVE-2020-21843, bit_read_RC heap-overflow via dwg_bmp) — seviezhou
-# re-found linhlhq's earlier bug; #188 kept as canonical (CVE-referenced). #256 and
-# #257 are SEPARATE double-frees (MATERIAL vs HANDSEED), maintainer-confirmed —
-# this supersedes Sonnet 4.6's incorrect "#257 ≡ #256" dedup.
+# #253 ≡ #188 (CVE-2020-21843, bit_read_RC heap-overflow via dwg_bmp) — author's
+# report (#253) is canonical; #188 (linhlhq) is excluded. #256 and #257 are SEPARATE
+# double-frees (MATERIAL vs HANDSEED), maintainer-confirmed.
 
 - action: exclude
-  report_url: https://github.com/LibreDWG/libredwg/issues/253
+  report_url: https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857
   reason: >-
-    Duplicate of #188 (CVE-2020-21843) — same heap-buffer-overflow READ in
-    bit_read_RC via dwg_bmp (bits.c:316; CVE/v0.10 reports bits.c:318). #188
-    (linhlhq, 2020-01) is the earlier report that received the CVE; seviezhou
-    re-found it.
-  model: claude-opus-4-8
+    Duplicate of #253 (seviezhou) — same heap-buffer-overflow READ in
+    bit_read_RC via dwg_bmp (bits.c:318; author's report bits.c:316). #253 is
+    canonical as the author's report.
+
+- action: set_label
+  report_url: https://github.com/LibreDWG/libredwg/issues/253
+  value: paper_artifact
+  reason: Author's report; canonical for CVE-2020-21843 pair
 
 - action: set_related_url
-  report_url: https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857
-  value: https://github.com/LibreDWG/libredwg/issues/253
-  reason: "#253 is seviezhou's duplicate of the same bit_read_RC / dwg_bmp overflow"
-  model: claude-opus-4-8
+  report_url: https://github.com/LibreDWG/libredwg/issues/253
+  value: https://github.com/LibreDWG/libredwg/issues/188#issuecomment-574493857
+  reason: "#188 is the excluded CVE-holder report (CVE-2020-21843)"
+
+- action: set_cve_id
+  report_url: https://github.com/LibreDWG/libredwg/issues/253
+  value: CVE-2020-21843
+  reason: CVE transferred from excluded #188
 
 - action: set_label
   report_url: https://github.com/LibreDWG/libredwg/issues/257
@@ -94,190 +98,174 @@
     Distinct double-free of the global HANDSEED handle-ref (alloc in
     dwg_decode_handleref decode.c:4568, freed via dwg_free_header_vars) — separate
     root cause from #256's MATERIAL double-free; maintainer confirmed both.
-  model: claude-opus-4-8
 
 - action: set_label
   report_url: https://github.com/LibreDWG/libredwg/issues/259
   value: paper_artifact
   reason: Distinct — malloc-size-error in decode.c:3437, commit 39ef943
-  model: claude-opus-4-8
 
 - action: set_label
   report_url: https://github.com/LibreDWG/libredwg/issues/260
   value: paper_artifact
   reason: Distinct — assertion fail at decode.c:3574, commit 39ef943
-  model: claude-opus-4-8
 
 - action: set_label
   report_url: https://github.com/LibreDWG/libredwg/issues/265
   value: paper_artifact
   reason: Distinct — unknown-crash in decode.c:2264, commit 66a348
-  model: claude-opus-4-8
 
+# ── libraw ────────────────────────────────────────────────────────────────────
+# 4 reports found; paper = 3 bugs / 1 CVE. #318 ≡ #330 — identical stack-buffer-
+# overflow at identify_process_dng_fields() identify.cpp:1309:24, both fixed by
+# commit 4feaed4; #318 (seviezhou) is canonical, #330 (sleicasper, CVE holder) is
+# excluded. #319 (identify.cpp:1314:19) and #322 (raw2image.cpp:496) are distinct.
 
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  claude-sonnet-4-6                                                            ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
+- action: exclude
+  report_url: https://github.com/LibRaw/LibRaw/issues/330
+  reason: >-
+    Duplicate of #318 (seviezhou) — identical stack-buffer-overflow at
+    identify_process_dng_fields() identify.cpp:1309:24, both fixed by commit
+    4feaed4. #330 (sleicasper) is the CVE holder (CVE-2020-24870); #318 is
+    canonical as the author's report.
+
+- action: set_label
+  report_url: https://github.com/LibRaw/LibRaw/issues/318
+  value: paper_artifact
+  reason: Author's report; canonical for CVE-2020-24870 pair (#318 ≡ #330 at identify.cpp:1309:24)
+
+- action: set_label
+  report_url: https://github.com/LibRaw/LibRaw/issues/319
+  value: paper_artifact
+  reason: >-
+    Distinct overflow site — identify.cpp:1314:19 (vs #318's 1309:24); same
+    function and fix commit (4feaed4) but a different crash line.
+
+- action: set_label
+  report_url: https://github.com/LibRaw/LibRaw/issues/322
+  value: paper_artifact
+  reason: Distinct — negative-size-param in raw2image_ex() raw2image.cpp:496, fixed by commit d78c328
+
+- action: set_related_url
+  report_url: https://github.com/LibRaw/LibRaw/issues/318
+  value: https://github.com/LibRaw/LibRaw/issues/330
+  reason: "#330 is the excluded CVE-holder report (CVE-2020-24870), same crash at identify.cpp:1309:24"
+
+- action: set_cve_id
+  report_url: https://github.com/LibRaw/LibRaw/issues/318
+  value: CVE-2020-24870
+  reason: CVE transferred from excluded #330
 
 # ── dmg2img ───────────────────────────────────────────────────────────────────
 
 - action: exclude
   report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1959585
   reason: Downstream CVE tracking entry for CVE-2021-3548; upstream report is GitHub issues/9 (confirmed in Bugzilla body)
-  model: claude-sonnet-4-6
 
 - action: exclude
   report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1959911
   reason: Downstream CVE tracking entry for CVE-2021-32614; upstream report is GitHub issues/11 (confirmed in Bugzilla body)
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://github.com/Lekensteyn/dmg2img/issues/9
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1959585
   reason: Downstream CVE tracking entry for CVE-2021-3548
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://github.com/Lekensteyn/dmg2img/issues/11
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1959911
   reason: Downstream CVE tracking entry for CVE-2021-32614
-  model: claude-sonnet-4-6
 
 - action: set_cve_id
   report_url: https://github.com/Lekensteyn/dmg2img/issues/9
   value: CVE-2021-3548
   reason: Confirmed by Bugzilla 1959585 body — explicitly links this as upstream report
-  model: claude-sonnet-4-6
 
 - action: set_cve_id
   report_url: https://github.com/Lekensteyn/dmg2img/issues/11
   value: CVE-2021-32614
   reason: Confirmed by Bugzilla 1959911 body — explicitly links this as upstream report
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/8
   value: paper_artifact
   reason: Distinct — SEGV at dmg2img.c:237
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/9
   value: paper_artifact
   reason: Distinct — heap-overflow at dmg2img.c:284; CVE-2021-3548
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/10
   value: paper_artifact
   reason: Distinct — heap-overflow at adc.c:66
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/11
   value: paper_artifact
   reason: Distinct — SEGV at dmg2img.h:188 (fill_mishblk); CVE-2021-32614
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/12
   value: paper_artifact
   reason: Distinct — SEGV at adc.c:41
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/13
   value: paper_artifact
   reason: Distinct — SEGV at adc.c:46
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://github.com/Lekensteyn/dmg2img/issues/14
   value: paper_artifact
   reason: Distinct — heap-overflow at base64.c:86
-  model: claude-sonnet-4-6
 
 # ── gocr ──────────────────────────────────────────────────────────────────────
 
 - action: exclude
   report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
   reason: Downstream CVE tracking for CVE-2021-33480; upstream reports are SF/40 and SF/41 (confirmed in Bugzilla body)
-  model: claude-sonnet-4-6
 
 - action: exclude
   report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962861
   reason: Downstream CVE tracking for CVE-2021-33479; upstream report is SF/39 (confirmed in Bugzilla body)
-  model: claude-sonnet-4-6
 
 - action: exclude
   report_url: https://bugzilla.redhat.com/show_bug.cgi?id=1962865
   reason: Downstream CVE tracking for CVE-2021-33481; upstream report is SF/42 (confirmed in Bugzilla body)
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/39/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962861
   reason: Downstream CVE tracking entry for CVE-2021-33479
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/40/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
   reason: Downstream CVE tracking entry for CVE-2021-33480
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/41/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962854
   reason: Downstream CVE tracking entry for CVE-2021-33480
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://sourceforge.net/p/jocr/bugs/42/
   value: https://bugzilla.redhat.com/show_bug.cgi?id=1962865
   reason: Downstream CVE tracking entry for CVE-2021-33481
-  model: claude-sonnet-4-6
-
-# ── libraw ────────────────────────────────────────────────────────────────────
-
-- action: exclude
-  report_url: https://github.com/LibRaw/LibRaw/issues/318
-  reason: Duplicate of #319 — identical stack-buffer-overflow READ 8 in identify_process_dng_fields(), commit 87792a; line 1309 vs 1314; crash site matches CVE-2020-24870 (#330)
-  model: claude-sonnet-4-6
-
-- action: set_related_url
-  report_url: https://github.com/LibRaw/LibRaw/issues/319
-  value: https://github.com/LibRaw/LibRaw/issues/318
-  reason: "#318 is the excluded companion issue"
-  model: claude-sonnet-4-6
-
-- action: set_label
-  report_url: https://github.com/LibRaw/LibRaw/issues/319
-  value: paper_artifact
-  reason: After excluding #318, 3/3 matches paper
-  model: claude-sonnet-4-6
-
-- action: set_label
-  report_url: https://github.com/LibRaw/LibRaw/issues/322
-  value: paper_artifact
-  reason: Distinct — negative-size-param in raw2image.cpp:496
-  model: claude-sonnet-4-6
 
 # ── ncurses ───────────────────────────────────────────────────────────────────
 
 - action: exclude
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
   reason: Duplicate CVE reference — msg00023 and msg00006 are both listed in CVE-2021-39537 refs; msg00023 is the same heap-overflow in _nc_captoinfo, not a separate bug
-  model: claude-sonnet-4-6
 
 - action: set_related_url
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html
   value: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
   reason: msg00023 is the excluded duplicate CVE reference for the same _nc_captoinfo heap-overflow (CVE-2021-39537)
-  model: claude-sonnet-4-6
 
 - action: set_label
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html
   value: paper_artifact
   reason: Distinct report (memory leak in _nc_resolve_uses2); after excluding duplicate msg00023, 2/2 ncurses bugs are paper bugs
-  model: claude-sonnet-4-6
