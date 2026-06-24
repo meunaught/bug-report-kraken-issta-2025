@@ -9,7 +9,7 @@ Rules:
   5. No empty reporter field
 
 Exit 0 if all pass. Exit 1 if any fail — run `python main.py review` and
-update data/ai/suggestions.md to resolve mismatches.
+update data/ai/ai-overrides.yaml to resolve mismatches.
 
 Run via: python main.py verify
 """
@@ -102,7 +102,7 @@ def verify() -> bool:
             print(f"  {proj}")
         print()
         print("Run: python main.py review")
-        print("Then update data/ai/suggestions.md and data/overrides.yaml, then re-apply.")
+        print("Then update data/ai/ai-overrides.yaml or data/overrides.yaml, then re-apply.")
 
     return False
 

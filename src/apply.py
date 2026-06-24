@@ -1,6 +1,9 @@
 """
-Apply data/overrides.yaml to output/classified_auto.csv
-→ output/classified_human_{commit}.csv
+Apply overrides to output/classified_auto.csv → output/classified_human_{commit}.csv
+
+Sources (applied in order):
+  1. data/ai/ai-overrides.yaml  — AI-confirmed, user-approved
+  2. data/overrides.yaml        — human-curated only
 
 Run via: python main.py apply
 """
@@ -11,10 +14,11 @@ from pathlib import Path
 
 from client import git_short_commit
 
-ROOT           = Path(__file__).parent.parent
-CLASSIFIED_CSV = ROOT / "output" / "classified_auto.csv"
-OVERRIDES_YAML = ROOT / "data" / "overrides.yaml"
-OUTPUT_DIR     = ROOT / "output"
+ROOT              = Path(__file__).parent.parent
+CLASSIFIED_CSV    = ROOT / "output" / "classified_auto.csv"
+AI_OVERRIDES_YAML = ROOT / "data" / "ai" / "ai-overrides.yaml"
+OVERRIDES_YAML    = ROOT / "data" / "overrides.yaml"
+OUTPUT_DIR        = ROOT / "output"
 
 FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id"]
 
@@ -22,7 +26,10 @@ ACTIONS = {"exclude", "set_label", "set_cve_id", "set_reporter", "set_related_ur
 
 
 def apply_overrides() -> Path:
-    overrides = yaml.safe_load(OVERRIDES_YAML.read_text())
+    overrides = (
+        yaml.safe_load(AI_OVERRIDES_YAML.read_text()) +
+        yaml.safe_load(OVERRIDES_YAML.read_text())
+    )
 
     unknown_actions = {r["action"] for r in overrides} - ACTIONS
     if unknown_actions:

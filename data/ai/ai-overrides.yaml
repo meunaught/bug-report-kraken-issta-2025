@@ -183,3 +183,19 @@
   report_url: https://github.com/LibreDWG/libredwg/issues/265
   value: paper_artifact
   reason: Distinct — unknown-crash in decode.c:2264, commit 66a348
+
+# ── ncurses ───────────────────────────────────────────────────────────────────
+
+- action: exclude
+  report_url: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
+  reason: Duplicate CVE reference — msg00023 and msg00006 are both listed in CVE-2021-39537 refs; msg00023 is the same heap-overflow in _nc_captoinfo, not a separate bug
+
+- action: set_related_url
+  report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html
+  value: https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html
+  reason: msg00023 is the excluded duplicate CVE reference for the same _nc_captoinfo heap-overflow (CVE-2021-39537)
+
+- action: set_label
+  report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html
+  value: paper_artifact
+  reason: Distinct report (memory leak in _nc_resolve_uses2); after excluding duplicate msg00023, 2/2 ncurses bugs are paper bugs
