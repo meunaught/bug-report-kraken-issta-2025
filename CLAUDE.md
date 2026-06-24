@@ -25,9 +25,15 @@ python main.py verify          # check classified_human_{commit}.csv against pro
 
 For AI-assisted classification: after `review`, read the HTMLs in `cache/html/` alongside
 `output/classified_auto.csv` and `data/projects.csv`, then write suggestions to
-`data/ai/suggestions.md`. Verified entries are moved into `data/overrides.yaml`. The `review`
-step triggers on any project where the found bug count or CVE count differs from
-`data/projects.csv`.
+`data/ai/suggestions.md`. The `review` step triggers on any project where the found bug count
+or CVE count differs from `data/projects.csv`.
+
+### Promoting suggestions to ai-overrides
+
+After writing `data/ai/suggestions.md`, go through it **one project at a time** and present
+each suggested action to the user for manual confirmation. Do not batch-apply — ask per
+project, wait for approval, then write confirmed entries to `data/ai/ai-overrides.yaml`.
+Never touch `data/overrides.yaml` — that file is human-curated only.
 
 Requires `GITHUB_TOKEN` in `.env`.
 
@@ -85,6 +91,7 @@ not the pipeline — the verify failures for gpac and libredwg are expected and 
 | `data/projects.csv` | 37 KRAKEN targets with paper `bugs` and `cves` counts |
 | `data/curated.csv` | `project, bug_url, author` — entries no automated search can reach (Debian, NASM Bugzilla, ncurses ML) |
 | `data/overrides.yaml` | Machine-applied corrections: list of `{action, report_url, value?, reason}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_related_url` |
-| `data/ai/suggestions.md` | AI-suggested overrides (pending human verification); written by Claude Code after reading `cache/html/` |
+| `data/ai/suggestions.md` | AI-suggested overrides; written by Claude Code after reading `cache/html/` |
+| `data/ai/ai-overrides.yaml` | User-confirmed AI overrides; same format as `overrides.yaml`; written by Claude Code after per-project user approval of `suggestions.md` |
 | `data/generated/author_bugs.csv` | Output of `search-author`; gitignored |
 | `cache/` | CVE JSON files + `authors.json` reporter cache + `html/` HTML pages; gitignored |
