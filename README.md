@@ -32,7 +32,7 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 
 ### Example — bento4 (paper: 6 bugs, 4 CVEs)
 
-8 reports found by the pipeline. Two pairs are duplicates: #544 (seviezhou) ≡ #509, and #546 (seviezhou) ≡ #615. The author's reports are canonical; CVE-holder reports are excluded and moved to `related_url`.
+8 reports found by the pipeline. The classifier resolves 4 directly via CVE records (`paper_artifact`) and leaves 4 as `unknown` (8 found ≠ 6 expected). The mismatch — 8 found but only 6 in the paper — hints that duplicates exist. Inspecting the 4 unknowns against the 4 CVE-matched reports reveals two duplicate pairs: #544 ≡ #509 and #546 ≡ #615 (same crash, different reporters). Once the duplicates are excluded and their CVEs transferred to the author's reports, the remaining 4 unknowns resolve to `paper_artifact` and the count reaches 6.
 
 | Issue | Auto CVE | Classifier | Human review |
 |---|---|---|---|
