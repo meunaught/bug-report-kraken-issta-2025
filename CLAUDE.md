@@ -62,14 +62,15 @@ Orphan CVE bugs (in CVE references but not found by author search) are added aut
 
 `python main.py verify` will always report CVE count mismatches for two projects:
 
-| Project | Expected CVEs | Found CVEs | Notes |
-|---|---|---|---|
-| gpac | 9 | 8 | 9th CVE in trophy list but failed to fetch from CVEProject/cvelistV5 (404) |
-| libredwg | 9 | 8 | 9th CVE in trophy list but failed to fetch from CVEProject/cvelistV5 (404) |
+| Project | Expected CVEs | Found CVEs |
+|---|---|---|
+| gpac | 9 | 8 |
+| libredwg | 9 | 8 |
 
-117 of 119 CVEs from the trophy list are fetchable; 2 are missing from the CVEProject/cvelistV5
-source and leave `.missing` sentinel files in `cache/json/`. These gaps are in the upstream data,
-not the pipeline — the verify failures for gpac and libredwg are expected and can be ignored.
+117 of 119 CVEs from the trophy list are fetchable; 2 are reserved CVEs (exist but not yet
+published) in CVEProject/cvelistV5 and leave `.missing` sentinel files in `cache/json/`. These
+gaps are in the upstream data, not the pipeline — the verify failures for gpac and libredwg are
+expected and can be ignored.
 
 ## Source files
 
