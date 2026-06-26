@@ -1,10 +1,24 @@
 import os
+import re
 import subprocess
 from pathlib import Path
 
 import httpx
 
 _ENV_FILE = Path(__file__).parent.parent / ".env"
+
+ROOT       = Path(__file__).parent.parent
+ISSUE_JSON = ROOT / "cache" / "json" / "issues"
+PR_JSON    = ROOT / "cache" / "json" / "prs"
+CVE_JSON   = ROOT / "cache" / "json" / "cve"
+HTML_ISSUE = ROOT / "cache" / "html" / "issue"
+HTML_PR    = ROOT / "cache" / "html" / "pr"
+TRAC_CACHE = ROOT / "cache" / "json" / "trac_ffmpeg.tsv"
+
+
+def url_slug(url: str, ext: str = ".json") -> str:
+    url = re.sub(r"^https?://", "", url)
+    return re.sub(r"[^a-zA-Z0-9._-]", "_", url) + ext
 
 
 def _load_env() -> None:

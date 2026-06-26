@@ -31,7 +31,7 @@ HAND_CURATED   = DATA_DIR / "curated.csv"
 CLASSIFIED_CSV = OUTPUT_DIR / "classified_auto.csv"
 PROJECTS_CSV   = DATA_DIR / "projects.csv"
 
-FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id"]
+FIELDS = ["project", "report_url", "related_url", "where_url_found", "date", "reporter", "cve_id", "notes"]
 
 # ── URL canonicalisation ───────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ def _load_cve_map() -> tuple[dict[str, str], dict[str, str]]:
 
 def _merge(existing: dict, incoming: dict) -> dict:
     out = dict(existing)
-    for field in ("project", "author", "cve_id"):
+    for field in ("project", "reporter", "author", "cve_id", "date", "related_url", "where_url_found", "notes"):
         if not out.get(field) and incoming.get(field):
             out[field] = incoming[field]
     return out
@@ -115,9 +115,12 @@ def _load_bugs(cve_map: dict[str, str], fragment_urls: dict[str, str], kraken_pr
     seen: dict[str, dict] = {}
 
     def _add(rec: dict) -> None:
-        url = _canonicalize(rec["bug_url"])
+        # support both old (bug_url/author) and new (report_url/reporter) column names
+        url = _canonicalize(rec.get("report_url") or rec.get("bug_url", ""))
         rec = dict(rec)
         rec["bug_url"] = url
+        if not rec.get("reporter") and rec.get("author"):
+            rec["reporter"] = rec["author"]
         if not rec.get("cve_id"):
             rec["cve_id"] = cve_map.get(_normalize(url), "")
         key = _normalize(url)
@@ -188,6 +191,9 @@ def classify(bugs: list[dict], kraken_projects: set[str], supplement: dict) -> l
     return kept
 
 
+DATE_CUTOFF = "2025-04-24"
+
+
 def build_classified_bugs_csv() -> Path:
     from reporter import get_reporters, is_supported
 
@@ -200,25 +206,34 @@ def build_classified_bugs_csv() -> Path:
 
     bugs = _load_bugs(cve_map, fragment_urls, kraken_projects)
     classified = classify(bugs, kraken_projects, supplement)
+
+    before = len(classified)
+    classified = [r for r in classified if not r.get("date") or r["date"][:10] <= DATE_CUTOFF]
+    dropped = before - len(classified)
+    if dropped:
+        print(f"  Dropped {dropped} bug(s) newer than {DATE_CUTOFF}")
+
     classified.sort(key=lambda r: (r["project"], r["bug_url"]))
 
     # Fetch reporters for GitHub URLs that have no author set
     fetchable = [r["bug_url"] for r in classified
-                 if not r.get("author") and is_supported(r["bug_url"])]
+                 if not r.get("author") and not r.get("reporter") and is_supported(r["bug_url"])]
     reporters = get_reporters(fetchable) if fetchable else {}
 
     with CLASSIFIED_CSV.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         for rec in classified:
-            reporter = rec.get("author") or reporters.get(rec["bug_url"], "")
+            reporter = rec.get("reporter") or rec.get("author") or reporters.get(rec["bug_url"], "")
             writer.writerow({
                 "project":         rec.get("project", ""),
                 "report_url":      rec["bug_url"],
+                "related_url":     rec.get("related_url", ""),
                 "where_url_found": rec["where_url_found"],
+                "date":            rec.get("date", ""),
                 "reporter":        reporter,
                 "cve_id":          rec.get("cve_id", ""),
-                "related_url":     "",
+                "notes":           rec.get("notes", ""),
             })
 
     counts = {v: sum(1 for r in classified if r["where_url_found"] == v)

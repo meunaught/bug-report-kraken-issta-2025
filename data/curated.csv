@@ -1,7 +1,13 @@
-project,bug_url,author
-jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967924,Anshunkang Zhou
-jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967971,Anshunkang Zhou
-nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392711,zhouan
-nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392716,zhouan
-ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html,Anshunkang Zhou
-ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html,Anshunkang Zhou
+project,report_url,related_url,where_url_found,date,reporter,cve_id,notes
+jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967924,,,2020-08-05T04:15:02Z,Anshunkang Zhou,,
+jhead,https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967971,,,2020-08-06T03:18:02Z,Anshunkang Zhou,,
+nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392711,,,2020-08-02T20:13:00Z,zhouan,,
+nasm,https://bugzilla.nasm.us/show_bug.cgi?id=3392716,,,2020-08-30T19:41:00Z,zhouan,,
+ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html,,,2020-08-04T00:00:00Z,Anshunkang Zhou,,
+ncurses,https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html,,,2020-08-04T00:00:00Z,Anshunkang Zhou,,
+pdftools,https://github.com/leonhad/pdftools/issues/1,https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/1,,2020-08-05T00:00:00Z,seviezhou,CVE-2021-39543,Archived copy (original deleted)
+pdftools,https://github.com/leonhad/pdftools/issues/2,https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/2,,2020-08-06T00:00:00Z,seviezhou,CVE-2021-39540,Archived copy (original deleted)
+pdftools,https://github.com/leonhad/pdftools/issues/3,https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/3,,2020-08-06T00:00:00Z,seviezhou,CVE-2021-39541,Archived copy (original deleted)
+pdftools,https://github.com/leonhad/pdftools/issues/4,https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/4,,2020-08-06T00:00:00Z,seviezhou,CVE-2021-39538,Archived copy (original deleted)
+pdftools,https://github.com/leonhad/pdftools/issues/5,https://web.archive.org/web/20201018023241/https://github.com/leonhad/pdftools/issues/5,,2020-08-06T00:00:00Z,seviezhou,CVE-2021-39542,Archived copy (original deleted)
+pdftools,https://github.com/leonhad/pdftools/issues/6,https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/6,,2020-08-06T00:00:00Z,seviezhou,CVE-2021-39539,Archived copy (original deleted)

@@ -1,12 +1,13 @@
 import csv
+import json
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
 import httpx
 
-from client import github_get
+from client import github_get, ISSUE_JSON, PR_JSON, TRAC_CACHE, url_slug
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "generated"
 
@@ -43,6 +44,7 @@ class BugResult:
     project: str
     bug_url: str
     author:  str
+    date:    str = ""
 
 
 # ── GitHub ────────────────────────────────────────────────────────────────────
@@ -53,6 +55,9 @@ def _repo_name(repository_url: str) -> str:
 
 
 def search_github() -> list[BugResult]:
+    ISSUE_JSON.mkdir(parents=True, exist_ok=True)
+    PR_JSON.mkdir(parents=True, exist_ok=True)
+
     results: list[BugResult] = []
     page = 1
 
@@ -71,10 +76,18 @@ def search_github() -> list[BugResult]:
 
         items = r.json().get("items", [])
         for item in items:
+            url = item.get("html_url", "")
+            is_pr = "/pull/" in url
+            cache_dir = PR_JSON if is_pr else ISSUE_JSON
+            cache_file = cache_dir / url_slug(url)
+            if not cache_file.exists():
+                cache_file.write_text(json.dumps(item))
+
             results.append(BugResult(
                 project=_repo_name(item.get("repository_url", "")),
-                bug_url=item.get("html_url", ""),
+                bug_url=url,
                 author=GITHUB_USERNAME,
+                date=item.get("created_at", ""),
             ))
 
         if len(items) < 100 or page * 100 >= 1000:
@@ -111,7 +124,7 @@ def _sf_all_ticket_nums(sf_project: str, sf_tracker: str) -> list[int]:
 
 
 def search_sourceforge() -> list[BugResult]:
-    from reporter import get_reporters
+    from reporter import get_reporters, get_sf_dates
 
     results: list[BugResult] = []
 
@@ -121,6 +134,7 @@ def search_sourceforge() -> list[BugResult]:
 
         urls = [f"https://sourceforge.net/p/{sf_project}/{sf_tracker}/{num}" for num in nums]
         reporters = get_reporters(urls)
+        dates     = get_sf_dates(urls)
 
         for url, reporter in reporters.items():
             if reporter in SF_USERNAMES:
@@ -128,6 +142,7 @@ def search_sourceforge() -> list[BugResult]:
                     project=internal,
                     bug_url=url,
                     author=reporter,
+                    date=dates.get(url, ""),
                 ))
 
     return results
@@ -136,34 +151,57 @@ def search_sourceforge() -> list[BugResult]:
 # ── FFmpeg Trac ───────────────────────────────────────────────────────────────
 
 def search_trac() -> list[BugResult]:
-    url = f"https://trac.ffmpeg.org/query?reporter={TRAC_USERNAME}&format=tab"
-    try:
-        r = httpx.get(url, follow_redirects=True, timeout=20)
-    except Exception:
-        return []
-    if r.status_code != 200:
-        return []
+    url = f"https://trac.ffmpeg.org/query?reporter={TRAC_USERNAME}&col=id&col=time&format=tab"
+
+    if TRAC_CACHE.exists():
+        text = TRAC_CACHE.read_text(encoding="utf-8")
+    else:
+        try:
+            r = httpx.get(url, follow_redirects=True, timeout=20)
+            if r.status_code != 200:
+                return []
+            text = r.text
+            TRAC_CACHE.parent.mkdir(parents=True, exist_ok=True)
+            TRAC_CACHE.write_text(text, encoding="utf-8")
+        except Exception:
+            return []
 
     results: list[BugResult] = []
-    lines = r.text.splitlines()
+    lines = text.splitlines()
     if len(lines) < 2:
         return []
 
     headers = [h.strip("﻿") for h in lines[0].split("\t")]
-    try:
-        id_col = headers.index("id")
-    except ValueError:
-        id_col = 0
+    id_col   = headers.index("id")      if "id"      in headers else 0
+    # Trac returns the time column as "Created" when using &col=time
+    time_col = headers.index("Created") if "Created" in headers else (
+               headers.index("time")    if "time"    in headers else -1)
 
     for line in lines[1:]:
         cols = line.split("\t")
         ticket_id = cols[id_col].strip() if id_col < len(cols) else ""
-        if ticket_id:
-            results.append(BugResult(
-                project="ffmpeg",
-                bug_url=f"https://trac.ffmpeg.org/ticket/{ticket_id}",
-                author=TRAC_USERNAME,
-            ))
+        if not ticket_id:
+            continue
+        date = ""
+        if 0 <= time_col < len(cols):
+            raw = cols[time_col].strip()
+            # Trac returns "Aug 11, 2020, 2:52:01 AM" format
+            try:
+                import datetime
+                dt = datetime.datetime.strptime(raw, "%b %d, %Y, %I:%M:%S %p")
+                date = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            except ValueError:
+                try:
+                    ts = int(raw) / 1_000_000
+                    date = datetime.datetime.utcfromtimestamp(ts).strftime("%Y-%m-%dT%H:%M:%SZ")
+                except (ValueError, OSError):
+                    date = raw
+        results.append(BugResult(
+            project="ffmpeg",
+            bug_url=f"https://trac.ffmpeg.org/ticket/{ticket_id}",
+            author=TRAC_USERNAME,
+            date=date,
+        ))
 
     return results
 
@@ -229,11 +267,10 @@ def search_all() -> list[BugResult]:
 
 
 def write_csv(results: list[BugResult]) -> Path:
-    from dataclasses import asdict
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     out = DATA_DIR / "author_bugs.csv"
     with out.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["project", "bug_url", "author"])
+        writer = csv.DictWriter(f, fieldnames=["project", "bug_url", "author", "date"])
         writer.writeheader()
         writer.writerows(asdict(r) for r in results)
     return out

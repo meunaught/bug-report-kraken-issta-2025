@@ -23,9 +23,9 @@ AI_OVERRIDES_YAML = ROOT / "data" / "ai" / "ai-overrides.yaml"
 OVERRIDES_YAML    = ROOT / "data" / "overrides.yaml"
 OUTPUT_DIR        = ROOT / "output"
 
-FIELDS = ["project", "report_url", "related_url", "where_url_found", "reporter", "cve_id", "notes"]
+FIELDS = ["project", "report_url", "related_url", "where_url_found", "date", "reporter", "cve_id", "notes"]
 
-ACTIONS = {"exclude", "set_label", "set_cve_id", "set_reporter", "set_archived_url", "set_cve_ref"}
+ACTIONS = {"exclude", "set_label", "set_cve_id", "set_reporter", "set_archived_url", "set_cve_ref", "set_date"}
 
 
 AUTHOR_USERNAMES = {"seviezhou", "azhouad", "zhouhan"}
@@ -84,6 +84,7 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
     set_reporter  = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_reporter"}
     set_archived  = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_archived_url"}
     set_cve_ref   = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_cve_ref"}
+    set_date      = {r["report_url"]: r["value"] for r in overrides if r["action"] == "set_date"}
 
     stats = {a: 0 for a in ACTIONS}
     kept: list[dict] = []
@@ -104,6 +105,9 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
         if url in set_cve_ref:
             row["notes"] = f"[CVE-REFERENCE] {set_cve_ref[url]}"
             stats["set_cve_ref"] += 1
+        if url in set_date:
+            row["date"] = set_date[url]
+            stats["set_date"] += 1
         kept.append(row)
 
     return kept, stats
@@ -141,4 +145,5 @@ def apply_overrides() -> Path:
     print(f"  reporter set:     {label_stats['set_reporter']}")
     print(f"  archived url set: {label_stats['set_archived_url']}")
     print(f"  cve-ref notes:    {label_stats['set_cve_ref']}")
+    print(f"  date set:         {label_stats['set_date']}")
     return output_csv

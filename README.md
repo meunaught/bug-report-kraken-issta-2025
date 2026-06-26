@@ -11,7 +11,7 @@ See [CLAUDE.md](CLAUDE.md) for pipeline documentation.
 Each bug report is assigned one of three labels:
 
 | Label | Meaning |
-|---|---|
+| --- | --- |
 | `paper_artifact` | Bug was found and reported as part of the KRAKEN research |
 | `activity_history` | Bug filed outside the paper scope (non-KRAKEN project, or project where all paper bugs have CVEs) |
 | `unknown` | Cannot determine from available data alone |
@@ -35,11 +35,11 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 8 reports found by the pipeline. The classifier resolves 4 directly via CVE records (`paper_artifact`) and leaves 4 as `unknown` (8 found ≠ 6 expected). The mismatch — 8 found but only 6 in the paper — hints that duplicates exist. Inspecting the 4 unknowns against the 4 CVE-matched reports reveals two duplicate pairs: #544 ≡ #509 and #546 ≡ #615 (same crash, different reporters). Once the duplicates are excluded and their CVEs transferred to the author's reports, the remaining 4 unknowns resolve to `paper_artifact` and the count reaches 6.
 
 | Issue | Auto CVE | Classifier | Human review |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | #540 | CVE-2020-23912 | `paper_artifact` | — |
 | #545 | CVE-2021-32265 | `paper_artifact` | — |
-| #509 | CVE-2020-23331 | `paper_artifact` | excluded — duplicate of #544 (seviezhou); CVE-2020-23331 transferred to #544; becomes `related_url` |
-| #615 | CVE-2021-35306 | `paper_artifact` | excluded — duplicate of #546 (seviezhou); CVE-2021-35306 transferred to #546; becomes `related_url` |
+| #509 | CVE-2020-23331 | `paper_artifact` | excluded — duplicate of #544 (seviezhou); CVE-2020-23331 transferred to #544 |
+| #615 | CVE-2021-35306 | `paper_artifact` | excluded — duplicate of #546 (seviezhou); CVE-2021-35306 transferred to #546 |
 | #544 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; receives CVE-2020-23331 from #509 |
 | #546 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — author's canonical report; receives CVE-2021-35306 from #615 |
 | #539 | — | `unknown` (8 found ≠ 6) | `paper_artifact` — distinct crash site |
@@ -50,22 +50,21 @@ For remaining KRAKEN bugs without a CVE: if the total found equals the paper's b
 ## Stats
 
 | | Count |
-|---|---|
-| Total bug reports found by pipeline | 295 |
-| Classified by pipeline alone | 275 |
+| --- | --- |
+| Total bug reports found by pipeline | 258 |
+| Classified by pipeline alone | 238 |
 | Flagged `unknown` — needed manual inspection | 20 |
-| **Final rows after overrides** | **271** |
+| **Final rows after overrides** | **247** |
 
 Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, libredwg, ncurses):
 
 | | Count |
-|---|---|
-| Duplicate entries excluded | 10 |
-| Reclassified `unknown` → `paper_artifact` | 16 |
-| CVE IDs assigned to upstream reports | 2 |
-| Reporters set (deleted/archived issues) | 6 |
+| --- | --- |
+| Duplicate entries excluded | 11 |
+| Reclassified `unknown` → `paper_artifact` | 10 |
+| CVE IDs assigned to author reports | 7 |
 
-PR rows are handled separately: 13 matched PRs are collapsed into their linked issue's `related_url` and excluded from the row count; 24 unmatched PRs (no linked issue found) retain their own rows.
+9 PR rows appear in the output with `related_url` pointing to their linked issue. 51 override entries across `overrides.yaml` and `ai-overrides.yaml` cover label corrections, CVE assignments, and CVE-reference notes.
 
 ---
 

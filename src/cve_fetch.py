@@ -3,10 +3,9 @@ from pathlib import Path
 
 import httpx
 
-from client import github_client, github_get
+from client import github_client, github_get, CVE_JSON as CACHE_DIR
 
 CVELISTV5_RAW = "https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves"
-CACHE_DIR = Path(__file__).parent.parent / "cache" / "json"
 
 
 def cve_json_url(cve_id: str) -> str:

@@ -6,25 +6,19 @@ Run via: python main.py match-prs
 """
 
 import csv
-import re
 from pathlib import Path
 
 import httpx
 import yaml
 
-ROOT       = Path(__file__).parent.parent
+from client import HTML_PR as PR_CACHE, ROOT, url_slug
+
 AUTHOR_CSV = ROOT / "data" / "generated" / "author_bugs.csv"
-PR_CACHE   = ROOT / "cache" / "html" / "pr"
 PR_MATCHES = ROOT / "data" / "generated" / "pr-matches.yaml"
 
 
-def _slug(url: str) -> str:
-    url = re.sub(r"^https?://", "", url)
-    return re.sub(r"[^a-zA-Z0-9._-]", "_", url) + ".html"
-
-
 def _fetch_html(url: str) -> str | None:
-    path = PR_CACHE / _slug(url)
+    path = PR_CACHE / url_slug(url, ".html")
     if path.exists():
         print(f"  cached  {url}")
         return path.read_text(encoding="utf-8")

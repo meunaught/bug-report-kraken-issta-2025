@@ -13,21 +13,15 @@ and data/projects.csv, reasons about classifications, and writes data/ai/suggest
 """
 
 import csv
-import re
 from collections import defaultdict
 from pathlib import Path
 
 import httpx
 
-ROOT           = Path(__file__).parent.parent
+from client import HTML_ISSUE as HTML_CACHE, ROOT, url_slug
+
 CLASSIFIED_CSV = ROOT / "output" / "classified_auto.csv"
 PROJECTS_CSV   = ROOT / "data" / "projects.csv"
-HTML_CACHE     = ROOT / "cache" / "html"
-
-
-def _slug(url: str) -> str:
-    url = re.sub(r"^https?://", "", url)
-    return re.sub(r"[^a-zA-Z0-9._-]", "_", url) + ".html"
 
 
 def fetch_for_review() -> None:
@@ -70,7 +64,7 @@ def fetch_for_review() -> None:
 
     for row in to_fetch:
         url = row["report_url"]
-        path = HTML_CACHE / _slug(url)
+        path = HTML_CACHE / url_slug(url, ".html")
         if path.exists():
             print(f"  cached  [{row['where_url_found']}] {url}")
             continue

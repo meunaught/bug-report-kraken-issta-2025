@@ -1,8 +1,7 @@
 import json
 import re
-from pathlib import Path
 
-CACHE_DIR = Path(__file__).parent.parent / "cache" / "json"
+from client import CVE_JSON as CACHE_DIR
 
 # URL patterns that identify bug tracker links.
 _TRACKER_PATTERNS: list[re.Pattern] = [
