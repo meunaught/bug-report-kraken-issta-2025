@@ -1,7 +1,5 @@
-# Human-curated overrides
 # Applied by: python main.py apply → output/classified_human_{commit}.csv
 # AI-confirmed overrides live in data/ai/ai-overrides.yaml (applied first).
-# Do NOT edit programmatically — this file is human-curated only.
 
 # ── libelfin ──────────────────────────────────────────────────────────────────
 
@@ -14,11 +12,10 @@
   report_url: https://github.com/aclements/libelfin/issues/49
   reason: Duplicate of #45 (seviezhou); #49 (xiaoxiongwang, CVE-2020-24826) becomes related
 
-- action: set_related_url
+- action: set_cve_ref
   report_url: https://github.com/aclements/libelfin/issues/45
   value: https://github.com/aclements/libelfin/issues/49
   reason: "#49 is the excluded CVE-holder report (CVE-2020-24826)"
-  note: "Related URL in CVE"
 
 - action: set_cve_id
   report_url: https://github.com/aclements/libelfin/issues/45
@@ -57,38 +54,32 @@
   value: seviezhou
   reason: Verified by manual inspection of Wayback snapshot
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/1
   value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/1
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/2
   value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/2
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/3
   value: https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/3
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/4
   value: https://web.archive.org/web/20201018023240/https://github.com/leonhad/pdftools/issues/4
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/5
   value: https://web.archive.org/web/20201018023241/https://github.com/leonhad/pdftools/issues/5
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"
 
-- action: set_related_url
+- action: set_archived_url
   report_url: https://github.com/leonhad/pdftools/issues/6
   value: https://web.archive.org/web/20201018023239/https://github.com/leonhad/pdftools/issues/6
   reason: Original issue deleted; Wayback snapshot is the archived copy
-  note: "Archived copy (original deleted)"

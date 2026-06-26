@@ -10,7 +10,7 @@ Python pipeline that locates and classifies all bug reports filed by the first a
 - **KRAKEN targets**: 37 projects listed in `data/projects.csv` (also contains paper bug/CVE counts)
 - **Output**: `output/classified_auto.csv` (programmatic) → `output/classified_human_{commit}.csv` (after overrides)
 - **`where_url_found` values**: `paper_artifact` | `activity_history` | `unknown`
-- **`notes` values** (populated when `related_url` is set): `"Related URL in CVE"` | `"Archived copy (original deleted)"` | `"Excluded duplicate CVE reference"` | `"PR by author"`
+- **`notes` values**: `"Archived copy (original deleted)"` (when `related_url` is a Wayback Archive URL) | `"[CVE-REFERENCE] <url>"` (non-author CVE reference URL)
 
 ## Running the pipeline
 
@@ -27,20 +27,17 @@ python main.py verify          # check classified_human_{commit}.csv against pro
 
 For AI-assisted classification: after `review`, read the HTMLs in `cache/html/` alongside
 `output/classified_auto.csv` and `data/projects.csv`. The `review` step triggers on any project where:
+
 - found bug count or unique CVE count differs from `data/projects.csv`, or
 - a CVE ID appears on more than one row (potential duplicate needing `related_url`)
 
 ### AI-overrides workflow
 
-Go through triggering projects **one at a time**, present suggested actions to the user,
-wait for approval, then write confirmed entries to `data/ai/ai-overrides.yaml`.
-Do not batch-apply. Both override files are human-verified before applying.
-
-Requires `GITHUB_TOKEN` in `.env`.
+Run `/ai-overrides` for the full step-by-step process. Requires `GITHUB_TOKEN` in `.env`.
 
 ## Pipeline architecture
 
-```
+```text
 CVE JSON cache        ──┐
 data/generated/       ──┼── src/classify.py ──→ output/classified_auto.csv
 data/curated.csv      ──┘
@@ -63,7 +60,7 @@ Orphan CVE bugs (in CVE references but not found by author search) are added aut
 `python main.py verify` will always report CVE count mismatches for two projects:
 
 | Project | Expected CVEs | Found CVEs |
-|---|---|---|
+| --- | --- | --- |
 | gpac | 9 | 8 |
 | libredwg | 9 | 8 |
 
@@ -75,7 +72,7 @@ expected and can be ignored.
 ## Source files
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `src/client.py` | Shared httpx client with GitHub token + `.env` loader; `git_short_commit()` helper |
 | `src/cve_list.py` | Fetch 119 CVE IDs from KRAKEN README Trophy section |
 | `src/cve_fetch.py` | Download CVE JSON records to `cache/` |
@@ -91,11 +88,11 @@ expected and can be ignored.
 ## Data files
 
 | File | Notes |
-|------|-------|
+| --- | --- |
 | `data/projects.csv` | 37 KRAKEN targets with paper `bugs` and `cves` counts |
 | `data/curated.csv` | `project, bug_url, author` — entries no automated search can reach (Debian, NASM Bugzilla, ncurses ML) |
-| `data/overrides.yaml` | Human-verified corrections: list of `{action, report_url, value?, reason, note?}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_related_url` |
-| `data/ai/ai-overrides.yaml` | Human-verified AI-assisted overrides; same format as `overrides.yaml` (including optional `note:`); drafted by Claude Code, confirmed by user before applying |
+| `data/overrides.yaml` | Human-verified corrections: list of `{action, report_url, value?, reason}`; actions: `exclude`, `set_label`, `set_cve_id`, `set_reporter`, `set_archived_url`, `set_cve_ref` |
+| `data/ai/ai-overrides.yaml` | Human-verified AI-assisted overrides; same format as `overrides.yaml`; drafted by Claude Code, confirmed by user before applying |
 | `data/generated/author_bugs.csv` | Output of `search-author` (issues + PRs); gitignored |
 | `data/generated/pr-matches.yaml` | Output of `match-prs`; maps each PR URL to its linked issue URL (or null); gitignored |
 | `cache/` | CVE JSON files + `authors.json` reporter cache + `html/` HTML pages; gitignored |

@@ -7,6 +7,7 @@ Rules:
   3. Unique CVE count == paper CVEs per project
   4. No duplicate report_url
   5. No empty reporter field
+  6. All report_url and related_url (tracker URLs only) are author-verified
 
 Exit 0 if all pass. Exit 1 if any fail — run `python main.py review` and
 update data/ai/ai-overrides.yaml to resolve mismatches.
@@ -20,6 +21,9 @@ from collections import defaultdict
 from pathlib import Path
 
 from client import git_short_commit
+from reporter import is_supported
+
+AUTHOR_USERNAMES = {"seviezhou", "azhouad", "zhouan", "Anshunkang Zhou"}
 
 ROOT         = Path(__file__).parent.parent
 OUTPUT_DIR   = ROOT / "output"
@@ -57,6 +61,17 @@ def verify() -> bool:
     missing_reporter = [r["report_url"] for r in rows if not r.get("reporter")]
     for url in missing_reporter:
         failures.append(f"  empty reporter: {url}")
+
+    # Rule 6: all report_url and related_url must be author-verified
+    reporter_by_url = {r["report_url"]: r.get("reporter", "") for r in rows}
+    for r in rows:
+        for field in ("report_url", "related_url"):
+            url = r.get(field, "")
+            if not url or "web.archive.org" in url or not is_supported(url):
+                continue
+            reporter = reporter_by_url.get(url, "")
+            if reporter not in AUTHOR_USERNAMES:
+                failures.append(f"  not author-verified ({reporter or 'unknown'}): {url}")
 
     # Rules 2 & 3: per-project counts
     by_project: dict[str, list[dict]] = defaultdict(list)
