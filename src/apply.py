@@ -1,5 +1,5 @@
 """
-Apply overrides to output/classified_auto.csv → output/classified_human_{commit}.csv
+Apply overrides to output/classified_auto.csv → output/classified_{commit}.csv
 
 Two sequential passes:
   Pass 1 — PR matching  (data/generated/pr-matches.yaml)
@@ -126,7 +126,7 @@ def apply_overrides() -> Path:
     rows, label_stats = _pass2_labelling(rows)
 
     commit = git_short_commit()
-    output_csv = OUTPUT_DIR / f"classified_human_{commit}.csv"
+    output_csv = OUTPUT_DIR / f"classified_{commit}.csv"
 
     with output_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)

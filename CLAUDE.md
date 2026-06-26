@@ -8,7 +8,7 @@ Python pipeline that locates and classifies all bug reports filed by the first a
 
 - **Author identity**: Anshunkang Zhou — `seviezhou` on GitHub/Trac, `azhouad` on SourceForge, `zhouan` on NASM Bugzilla, real name on Debian/ncurses
 - **KRAKEN targets**: 37 projects listed in `data/projects.csv` (also contains paper bug/CVE counts)
-- **Output**: `output/classified_auto.csv` (programmatic) → `output/classified_human_{commit}.csv` (after overrides)
+- **Output**: `output/classified_auto.csv` (programmatic) → `output/classified_{commit}.csv` (after overrides)
 - **Date cutoff**: bugs with `date > 2025-04-24` are excluded from output
 - **`where_url_found` values**: `paper_artifact` | `activity_history` | `unknown`
 - **`notes` values**: `"Archived copy (original deleted)"` (when `related_url` is a Wayback Archive URL) | `"[CVE-REFERENCE] <url>"` (non-author CVE reference URL)
@@ -22,8 +22,8 @@ python main.py search-author   # populate data/generated/author_bugs.csv (slow: 
 python main.py generate        # build output/classified_auto.csv
 python main.py match-prs       # fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml
 python main.py review          # fetch HTML for projects with count mismatch → cache/html/
-python main.py apply           # apply pr-matches + overrides → output/classified_human_{commit}.csv
-python main.py verify          # check classified_human_{commit}.csv against projects.csv rules
+python main.py apply           # apply pr-matches + overrides → output/classified_{commit}.csv
+python main.py verify          # check classified_{commit}.csv against projects.csv rules
 ```
 
 For AI-assisted classification: after `review`, read the HTMLs in `cache/html/` alongside
@@ -44,7 +44,7 @@ data/generated/       ──┼── src/classify.py ──→ output/classifie
 data/curated.csv      ──┘
                               ↓ src/apply.py — pass 1: PR matching (data/generated/pr-matches.yaml)
                                               — pass 2: labelling  (data/overrides.yaml, data/ai/ai-overrides.yaml)
-                         output/classified_human_{commit}.csv
+                         output/classified_{commit}.csv
 ```
 
 ## Classification logic
@@ -84,7 +84,7 @@ expected and can be ignored.
 | `src/reporter.py` | Fetch reporter username for GitHub/SF URLs from per-item JSON cache |
 | `src/fetch_html.py` | Fetch HTML for projects with bug/CVE count mismatch → `cache/html/issue/` for AI reasoning |
 | `src/apply.py` | Two-pass apply: (1) PR matching via `pr-matches.yaml`, (2) labelling via override YAMLs |
-| `src/verify.py` | Verify `classified_human_{commit}.csv` against `data/projects.csv` rules; exits 1 if AI review needed |
+| `src/verify.py` | Verify `classified_{commit}.csv` against `data/projects.csv` rules; exits 1 if AI review needed |
 
 ## Data files
 

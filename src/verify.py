@@ -1,5 +1,5 @@
 """
-Verify output/classified_human_{commit}.csv against data/projects.csv rules.
+Verify output/classified_{commit}.csv against data/projects.csv rules.
 
 Rules:
   1. No unknown labels
@@ -32,7 +32,7 @@ PROJECTS_CSV = ROOT / "data" / "projects.csv"
 
 def verify() -> bool:
     commit = git_short_commit()
-    human_csv = OUTPUT_DIR / f"classified_human_{commit}.csv"
+    human_csv = OUTPUT_DIR / f"classified_{commit}.csv"
     if not human_csv.exists():
         print(f"ERROR: {human_csv} not found — run `python main.py apply` first")
         return False
