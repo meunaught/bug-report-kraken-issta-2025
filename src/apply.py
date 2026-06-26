@@ -1,10 +1,10 @@
 """
-Apply overrides to output/classified_auto.csv → output/classified_{commit}.csv
+Apply overrides to output/classified_{commit}.csv (in-place).
 
 Two sequential passes:
   Pass 1 — PR matching  (data/generated/pr-matches.yaml)
     Sets related_url on PR rows whose linked issue was filed by the verified author.
-  Pass 2 — Labelling    (data/ai/ai-overrides.yaml, data/overrides.yaml)
+  Pass 2 — Labelling    (data/static/patch.yaml)
     Applies label/CVE/reporter/archived-url/cve-ref corrections.
 
 Run via: python main.py apply
@@ -17,10 +17,8 @@ from pathlib import Path
 from client import git_short_commit
 
 ROOT              = Path(__file__).parent.parent
-CLASSIFIED_CSV    = ROOT / "output" / "classified_auto.csv"
 PR_MATCHES_YAML   = ROOT / "data" / "generated" / "pr-matches.yaml"
-AI_OVERRIDES_YAML = ROOT / "data" / "ai" / "ai-overrides.yaml"
-OVERRIDES_YAML    = ROOT / "data" / "overrides.yaml"
+AI_OVERRIDES_YAML = ROOT / "data" / "static" / "patch.yaml"
 OUTPUT_DIR        = ROOT / "output"
 
 FIELDS = ["project", "report_url", "related_url", "where_url_found", "date", "reporter", "cve_id", "notes"]
@@ -69,10 +67,7 @@ def _pass1_pr_matching(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
 
 def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
     """Apply label/CVE/reporter/related_url overrides."""
-    overrides = (
-        yaml.safe_load(AI_OVERRIDES_YAML.read_text()) +
-        yaml.safe_load(OVERRIDES_YAML.read_text())
-    )
+    overrides = yaml.safe_load(AI_OVERRIDES_YAML.read_text())
 
     unknown_actions = {r["action"] for r in overrides} - ACTIONS
     if unknown_actions:
@@ -114,7 +109,13 @@ def _pass2_labelling(rows: list[dict]) -> tuple[list[dict], dict[str, int]]:
 
 
 def apply_overrides() -> Path:
-    rows = list(csv.DictReader(CLASSIFIED_CSV.open()))
+    commit = git_short_commit()
+    classified_csv = OUTPUT_DIR / f"classified_{commit}.csv"
+    if not classified_csv.exists():
+        print(f"ERROR: {classified_csv} not found — run `python main.py generate` first")
+        return classified_csv
+
+    rows = list(csv.DictReader(classified_csv.open()))
     for row in rows:
         row.setdefault("notes", "")
 
@@ -125,8 +126,7 @@ def apply_overrides() -> Path:
     print("Pass 2: Labelling overrides")
     rows, label_stats = _pass2_labelling(rows)
 
-    commit = git_short_commit()
-    output_csv = OUTPUT_DIR / f"classified_{commit}.csv"
+    output_csv = classified_csv
 
     with output_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)

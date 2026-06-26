@@ -45,11 +45,6 @@ def cmd_match_prs(args: list[str]) -> None:
     match_prs()
 
 
-def cmd_review(args: list[str]) -> None:
-    from fetch_html import fetch_for_review
-    fetch_for_review()
-
-
 def cmd_apply(args: list[str]) -> None:
     from apply import apply_overrides
     apply_overrides()
@@ -74,9 +69,8 @@ COMMANDS = {
     "generate":      (cmd_generate,      "Build output/classified_auto.csv"),
     "search-author": (cmd_search_author, "Search bugs by author across GitHub, Trac, SF, Bugzilla"),
     "match-prs":     (cmd_match_prs,     "Fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml"),
-    "review":        (cmd_review,        "Fetch HTML for projects with bug/CVE count mismatch → cache/html/"),
-    "apply":         (cmd_apply,         "Apply pr-matches + overrides → output/classified_human_{commit}.csv"),
-    "verify":        (cmd_verify,        "Verify classified_human_{commit}.csv against projects.csv rules"),
+    "apply":         (cmd_apply,         "Apply pr-matches + overrides in-place to classified_{commit}.csv"),
+    "verify":        (cmd_verify,        "Verify classified_{commit}.csv; on failure write cache/review/<project>.md"),
 }
 
 

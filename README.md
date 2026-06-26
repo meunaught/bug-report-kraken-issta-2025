@@ -64,7 +64,7 @@ Of the 20 flagged unknowns (across 6 projects: bento4, dmg2img, gocr, libraw, li
 | Reclassified `unknown` → `paper_artifact` | 10 |
 | CVE IDs assigned to author reports | 7 |
 
-9 PR rows appear in the output with `related_url` pointing to their linked issue. 51 override entries across `overrides.yaml` and `ai-overrides.yaml` cover label corrections, CVE assignments, and CVE-reference notes.
+9 PR rows appear in the output with `related_url` pointing to their linked issue. 51 override entries in `data/static/patch.yaml` cover label corrections, CVE assignments, and CVE-reference notes.
 
 ---
 

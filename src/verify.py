@@ -6,11 +6,10 @@ Rules:
   2. paper_artifact count == paper bugs per project
   3. Unique CVE count == paper CVEs per project
   4. No duplicate report_url
-  5. No empty reporter field
-  6. All report_url and related_url (tracker URLs only) are author-verified
+  5. reporter must be present, a verified author identity, and any tracker related_url must also resolve to a verified author
 
 Exit 0 if all pass. Exit 1 if any fail — run `python main.py review` and
-update data/ai/ai-overrides.yaml to resolve mismatches.
+update data/static/patch.yaml to resolve mismatches.
 
 Run via: python main.py verify
 """
@@ -27,7 +26,7 @@ AUTHOR_USERNAMES = {"seviezhou", "azhouad", "zhouan", "Anshunkang Zhou"}
 
 ROOT         = Path(__file__).parent.parent
 OUTPUT_DIR   = ROOT / "output"
-PROJECTS_CSV = ROOT / "data" / "projects.csv"
+PROJECTS_CSV = ROOT / "data" / "static" / "projects.csv"
 
 
 def verify() -> bool:
@@ -42,12 +41,15 @@ def verify() -> bool:
              for r in csv.DictReader(PROJECTS_CSV.open())}
 
     failures: list[str] = []
+    failing_projects: set[str] = set()
+    url2proj = {r["report_url"]: r["project"] for r in rows}
 
     # Rule 1: no unknowns
-    unknowns = [r["report_url"] for r in rows if r["where_url_found"] == "unknown"]
-    if unknowns:
-        for url in unknowns:
-            failures.append(f"  unknown label: {url}")
+    for r in rows:
+        if r["where_url_found"] == "unknown":
+            failures.append(f"  unknown label: {r['report_url']}")
+            if r["project"]:
+                failing_projects.add(r["project"])
 
     # Rule 4: no duplicate report_url
     seen_urls: dict[str, int] = {}
@@ -56,22 +58,29 @@ def verify() -> bool:
     for url, count in seen_urls.items():
         if count > 1:
             failures.append(f"  duplicate url ({count}x): {url}")
+            if url2proj.get(url):
+                failing_projects.add(url2proj[url])
 
-    # Rule 5: no empty reporter
-    missing_reporter = [r["report_url"] for r in rows if not r.get("reporter")]
-    for url in missing_reporter:
-        failures.append(f"  empty reporter: {url}")
-
-    # Rule 6: all report_url and related_url must be author-verified
+    # Rule 5: reporter must be present, a verified author identity,
+    #          and any tracker related_url must also resolve to a verified author
     reporter_by_url = {r["report_url"]: r.get("reporter", "") for r in rows}
     for r in rows:
-        for field in ("report_url", "related_url"):
-            url = r.get(field, "")
-            if not url or "web.archive.org" in url or not is_supported(url):
-                continue
-            reporter = reporter_by_url.get(url, "")
-            if reporter not in AUTHOR_USERNAMES:
-                failures.append(f"  not author-verified ({reporter or 'unknown'}): {url}")
+        reporter = r.get("reporter", "")
+        if not reporter:
+            failures.append(f"  empty reporter: {r['report_url']}")
+            if r["project"]:
+                failing_projects.add(r["project"])
+        elif reporter not in AUTHOR_USERNAMES:
+            failures.append(f"  unverified reporter ({reporter}): {r['report_url']}")
+            if r["project"]:
+                failing_projects.add(r["project"])
+        related = r.get("related_url", "")
+        if related and "web.archive.org" not in related and is_supported(related):
+            related_reporter = reporter_by_url.get(related, "")
+            if related_reporter not in AUTHOR_USERNAMES:
+                failures.append(f"  unverified related_url ({related_reporter or 'unknown'}): {related}")
+                if r["project"]:
+                    failing_projects.add(r["project"])
 
     # Rules 2 & 3: per-project counts
     by_project: dict[str, list[dict]] = defaultdict(list)
@@ -79,7 +88,6 @@ def verify() -> bool:
         if r["project"]:
             by_project[r["project"]].append(r)
 
-    review_needed: list[str] = []
     for proj, proj_rows in sorted(by_project.items()):
         if proj not in paper:
             continue
@@ -98,7 +106,7 @@ def verify() -> bool:
             if not cve_ok:
                 parts.append(f"CVEs {found_cves}/{expected_cves}")
             failures.append(f"  {proj}: {', '.join(parts)}")
-            review_needed.append(proj)
+            failing_projects.add(proj)
 
     # Report
     print(f"Verifying {human_csv.name} ({len(rows)} rows)")
@@ -110,14 +118,13 @@ def verify() -> bool:
     for f in failures:
         print(f)
 
-    if review_needed:
+    if failing_projects:
+        from context_bundle import generate_context_for
         print()
-        print("AI-assisted review needed for:")
-        for proj in review_needed:
-            print(f"  {proj}")
+        print(f"Generating AI context for {len(failing_projects)} failing project(s):")
+        generate_context_for(sorted(failing_projects))
         print()
-        print("Run: python main.py review")
-        print("Then update data/ai/ai-overrides.yaml or data/overrides.yaml, then re-apply.")
+        print("Read cache/review/<project>.md, update data/static/patch.yaml, then re-apply.")
 
     return False
 

@@ -1,18 +1,24 @@
 # AI-overrides workflow
 
-Write entries to `data/ai/ai-overrides.yaml` to resolve mismatches found by `python main.py verify`.
+Write entries to `data/static/patch.yaml` to resolve mismatches found by `python main.py verify`.
 
 ## Setup
 
-1. Run `python main.py review` to fetch HTML for mismatched projects into `cache/html/`
-2. Read those HTMLs alongside `output/classified_auto.csv` and `data/projects.csv`
+1. Run `python main.py verify`. For every failing project it writes a raw evidence file
+   `cache/review/<project>.md` (report bodies, full sanitizer traces, cached page text).
+2. For each failing project, read:
+   - `cache/review/<project>.md` — raw evidence
+   - `data/static/projects.csv` — expected bug/CVE counts for that project
+   - `data/static/curated.csv` — manually verified entries (Debian, NASM, ncurses, deleted issues)
 
 ## Process
 
-- Work through triggering projects **one at a time**
+- Work through failing projects **one at a time** — do not proceed to the next until the user confirms
+- Before starting each project, **wait for the user** — they may switch AI model between projects
 - Present proposed entries for each project and wait for user approval before writing
-- Write confirmed entries directly to `data/ai/ai-overrides.yaml` — no intermediate files
+- Write confirmed entries directly to `data/static/patch.yaml` — no intermediate files
 - After all projects are resolved, run `python main.py apply && python main.py verify`
+  (verify re-writes context only for projects that still fail)
 
 ## Entry format
 
@@ -25,7 +31,7 @@ Write entries to `data/ai/ai-overrides.yaml` to resolve mismatches found by `pyt
 
 ## Actions
 
-| Action | Effect in classified_human_{commit}.csv |
+| Action | Effect in classified_{commit}.csv |
 | --- | --- |
 | `exclude` | Removes the row entirely |
 | `set_label` | Sets `where_url_found` to `value` (`paper_artifact` or `activity_history`) |
@@ -34,12 +40,17 @@ Write entries to `data/ai/ai-overrides.yaml` to resolve mismatches found by `pyt
 | `set_archived_url` | Sets `related_url` to `value` (Wayback URL); sets `notes` to `"Archived copy (original deleted)"` |
 | `set_cve_ref` | Sets `notes` to `"[CVE-REFERENCE] <value>"`; `related_url` stays empty |
 
+## Known expected failures
+
+gpac and libredwg will always fail CVE count (8/9) — 2 reserved CVEs not yet published in CVEProject/cvelistV5. Ignore these.
+
 ## Author-verification rule
 
 Every `report_url` and tracker `related_url` in the output must be filed by the verified author
 (`seviezhou`, `azhouad`, `zhouan`, `Anshunkang Zhou`).
 
 When a CVE names a different reporter for the same bug as the author's report:
+
 1. `exclude` the non-author row
 2. `set_cve_ref` on the author's canonical row to record the CVE URL
 3. `set_cve_id` on the canonical row to transfer the CVE ID

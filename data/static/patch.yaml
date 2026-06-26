@@ -269,3 +269,24 @@
   report_url: https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00007.html
   value: paper_artifact
   reason: Distinct report (memory leak in _nc_resolve_uses2); after excluding duplicate msg00023, 2/2 ncurses bugs are paper bugs
+
+# ── libelfin ──────────────────────────────────────────────────────────────────
+
+- action: set_label
+  report_url: https://github.com/aclements/libelfin/issues/45
+  value: paper_artifact
+  reason: Author's report; canonical for CVE-2020-24826 pair (#45 ≡ #49)
+
+- action: exclude
+  report_url: https://github.com/aclements/libelfin/issues/49
+  reason: Duplicate of #45 (seviezhou); #49 (xiaoxiongwang, CVE-2020-24826) becomes related
+
+- action: set_cve_ref
+  report_url: https://github.com/aclements/libelfin/issues/45
+  value: https://github.com/aclements/libelfin/issues/49
+  reason: "#49 is the excluded CVE-holder report (CVE-2020-24826)"
+
+- action: set_cve_id
+  report_url: https://github.com/aclements/libelfin/issues/45
+  value: CVE-2020-24826
+  reason: CVE transferred from excluded #49

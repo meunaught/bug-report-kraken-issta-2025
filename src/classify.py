@@ -24,12 +24,11 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-DATA_DIR       = Path(__file__).parent.parent / "data"
-OUTPUT_DIR     = Path(__file__).parent.parent / "output"
-AUTHOR_CSV     = DATA_DIR / "generated" / "author_bugs.csv"
-HAND_CURATED   = DATA_DIR / "curated.csv"
-CLASSIFIED_CSV = OUTPUT_DIR / "classified_auto.csv"
-PROJECTS_CSV   = DATA_DIR / "projects.csv"
+DATA_DIR     = Path(__file__).parent.parent / "data"
+OUTPUT_DIR   = Path(__file__).parent.parent / "output"
+AUTHOR_CSV   = DATA_DIR / "generated" / "author_bugs.csv"
+HAND_CURATED = DATA_DIR / "static" / "curated.csv"
+PROJECTS_CSV = DATA_DIR / "static" / "projects.csv"
 
 FIELDS = ["project", "report_url", "related_url", "where_url_found", "date", "reporter", "cve_id", "notes"]
 
@@ -196,6 +195,8 @@ DATE_CUTOFF = "2025-04-24"
 
 def build_classified_bugs_csv() -> Path:
     from reporter import get_reporters, is_supported
+    from client import git_short_commit
+    classified_csv = OUTPUT_DIR / f"classified_{git_short_commit()}.csv"
 
     projects_rows = list(csv.DictReader(PROJECTS_CSV.open()))
     kraken_projects = {r["project"] for r in projects_rows}
@@ -220,7 +221,7 @@ def build_classified_bugs_csv() -> Path:
                  if not r.get("author") and not r.get("reporter") and is_supported(r["bug_url"])]
     reporters = get_reporters(fetchable) if fetchable else {}
 
-    with CLASSIFIED_CSV.open("w", newline="") as f:
+    with classified_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         for rec in classified:
@@ -239,12 +240,12 @@ def build_classified_bugs_csv() -> Path:
     counts = {v: sum(1 for r in classified if r["where_url_found"] == v)
               for v in ("paper_artifact", "activity_history", "unknown")}
     print(
-        f"Written {len(classified)} rows → {CLASSIFIED_CSV}\n"
+        f"Written {len(classified)} rows → {classified_csv}\n"
         f"  paper_artifact:   {counts['paper_artifact']}\n"
         f"  activity_history: {counts['activity_history']}\n"
         f"  unknown:          {counts['unknown']}"
     )
-    return CLASSIFIED_CSV
+    return classified_csv
 
 
 if __name__ == "__main__":

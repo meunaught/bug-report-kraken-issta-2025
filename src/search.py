@@ -208,24 +208,6 @@ def search_trac() -> list[BugResult]:
 
 # ── Red Hat Bugzilla ──────────────────────────────────────────────────────────
 
-def _bz_ack_name(bug_id: int) -> str:
-    try:
-        r = httpx.get(
-            f"https://bugzilla.redhat.com/rest/bug/{bug_id}/comment",
-            follow_redirects=True, timeout=20,
-        )
-        if r.status_code != 200:
-            return ""
-        comments = r.json().get("bugs", {}).get(str(bug_id), {}).get("comments", [])
-        for c in comments:
-            m = re.search(r"Acknowledgments?:\s*\n+\s*Name:\s*(.+)", c.get("text", ""))
-            if m:
-                return m.group(1).strip()
-    except Exception:
-        pass
-    return ""
-
-
 def search_bugzilla() -> list[BugResult]:
     results: list[BugResult] = []
     for project, ids in BUGZILLA_CONFIRMED.items():
