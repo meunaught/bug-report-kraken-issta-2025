@@ -22,7 +22,7 @@ from pathlib import Path
 from client import git_short_commit
 from reporter import is_supported
 
-AUTHOR_USERNAMES = {"seviezhou", "azhouad", "zhouan", "Anshunkang Zhou"}
+AUTHOR_USERNAMES = {"seviezhou", "azhouad", "zhouan", "Anshunkang Zhou", "Zhou Anshunkang"}
 
 ROOT         = Path(__file__).parent.parent
 OUTPUT_DIR   = ROOT / "output"

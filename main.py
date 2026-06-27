@@ -50,6 +50,11 @@ def cmd_apply(args: list[str]) -> None:
     apply_overrides()
 
 
+def cmd_export(args: list[str]) -> None:
+    from export import export_kraken_csv
+    export_kraken_csv()
+
+
 def cmd_verify(args: list[str]) -> None:
     from verify import verify
     sys.exit(0 if verify() else 1)
@@ -70,6 +75,7 @@ COMMANDS = {
     "search-author": (cmd_search_author, "Search bugs by author across GitHub, Trac, SF, Bugzilla"),
     "match-prs":     (cmd_match_prs,     "Fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml"),
     "apply":         (cmd_apply,         "Apply pr-matches + overrides in-place to classified_{commit}.csv"),
+    "export":        (cmd_export,        "Export classified_{commit}.csv → output/kraken_{commit}.csv (starter_kraken format)"),
     "verify":        (cmd_verify,        "Verify classified_{commit}.csv; on failure write cache/review/<project>.md"),
 }
 

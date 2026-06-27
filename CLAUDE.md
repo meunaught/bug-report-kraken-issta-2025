@@ -6,7 +6,7 @@ Python pipeline that locates and classifies all bug reports filed by the first a
 
 ## Key facts
 
-- **Author identity**: Anshunkang Zhou — `seviezhou` on GitHub/Trac, `azhouad` on SourceForge, `zhouan` on NASM Bugzilla, real name on Debian/ncurses
+- **Author identity**: Anshunkang Zhou — `seviezhou` on GitHub, `azhouad` on SourceForge, `zhouan` on NASM Bugzilla, `Zhou Anshunkang` on FFmpeg Trac, real name on Debian/ncurses
 - **KRAKEN targets**: 37 projects listed in `data/static/projects.csv` (also contains paper bug/CVE counts)
 - **Output**: `output/classified_{commit}.csv` (programmatic base, then overrides applied in-place)
 - **Date cutoff**: bugs with `date > 2025-04-24` are excluded from output
@@ -29,6 +29,7 @@ python main.py generate        # build output/classified_{commit}.csv (programma
 python main.py match-prs       # fetch PR HTML, extract linked issues → data/generated/pr-matches.yaml
 python main.py apply           # apply pr-matches + overrides in-place to classified_{commit}.csv
 python main.py verify          # check classified_{commit}.csv; on failure → cache/review/<project>.md
+python main.py export          # convert classified_{commit}.csv → output/kraken_{commit}.csv (starter format)
 ```
 
 For AI-assisted classification: run `/ai-review` (reads `cache/review/<project>.md` written by `verify`, drafts entries for `data/static/patch.yaml`).
@@ -52,7 +53,7 @@ data/static/curated.csv           ──┘                               ↓
 2. `paper_artifact` count per project == `bugs` in `data/static/projects.csv`
 3. Unique `cve_id` count per project == `cves` in `data/static/projects.csv`
 4. No duplicate `report_url`
-5. `reporter` must be present and a verified author identity (`seviezhou`, `azhouad`, `zhouan`, `Anshunkang Zhou`); any tracker `related_url` must also resolve to a verified author
+5. `reporter` must be present and a verified author identity (`seviezhou`, `azhouad`, `zhouan`, `Anshunkang Zhou`, `Zhou Anshunkang`); any tracker `related_url` must also resolve to a verified author
 
 Failures trigger `cache/review/<project>.md` generation. Run `/ai-review` to resolve.
 
@@ -71,6 +72,7 @@ Failures trigger `cache/review/<project>.md` generation. Run `/ai-review` to res
 | `src/apply.py` | Two-pass apply: (1) PR matching via `pr-matches.yaml`, (2) labelling via `patch.yaml` |
 | `src/verify.py` | Verify `classified_{commit}.csv` against `data/static/projects.csv` rules; exits 1 if review needed, and writes `cache/review/<project>.md` for each failing project |
 | `src/context_bundle.py` | Build raw per-project evidence files (`cache/review/<project>.md`) for failing projects; fetches issue HTML on demand, no analysis applied. Driven by `verify` |
+| `src/export.py` | Convert `classified_{commit}.csv` → `output/kraken_{commit}.csv` in `starter_kraken` format (Wayback URLs as `report_url` for pdftools, reporter as full profile URLs, CVE IDs in `notes`) |
 
 ## Data files
 

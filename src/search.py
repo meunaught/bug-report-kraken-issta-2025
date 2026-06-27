@@ -18,7 +18,8 @@ AUTHOR_NAME     = "Anshunkang Zhou"
 GITHUB_USERNAME = "seviezhou"
 SF_USERNAME     = "azhouad"
 SF_USERNAMES    = {SF_USERNAME, "zhouhan"}  # additional SF identity for advancecomp
-TRAC_USERNAME   = "seviezhou"   # confirmed from existing cves.csv entries
+TRAC_USERNAME        = "seviezhou"       # login used to query the Trac API
+TRAC_DISPLAY_NAME   = "Zhou Anshunkang"  # name shown on Trac ticket pages
 
 # (sf_project, sf_tracker, internal_project_name)
 # SF project slugs differ from our internal names.
@@ -199,7 +200,7 @@ def search_trac() -> list[BugResult]:
         results.append(BugResult(
             project="ffmpeg",
             bug_url=f"https://trac.ffmpeg.org/ticket/{ticket_id}",
-            author=TRAC_USERNAME,
+            author=TRAC_DISPLAY_NAME,
             date=date,
         ))
 
